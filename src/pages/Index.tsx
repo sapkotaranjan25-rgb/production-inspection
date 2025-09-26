@@ -1,7 +1,7 @@
-import { InspectionForm } from "@/components/InspectionForm";
+import { ManufacturingForm } from "@/components/ManufacturingForm";
 
 const Index = () => {
-  return <InspectionForm />;
+  return <ManufacturingForm />;
 };
 
 export default Index;
