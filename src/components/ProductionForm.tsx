@@ -268,6 +268,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
                   <Download className="mr-2 h-4 w-4" />
                   Export Data
                 </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
