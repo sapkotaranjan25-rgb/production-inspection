@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ProductionForm } from "./ProductionForm";
 import { ProductionFormData } from "@/types/production";
-import { Plus, X, Factory } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Generate initial form data
@@ -37,6 +38,8 @@ export function ProductionTabs() {
     generateInitialFormData('form-1')
   ]);
   const [activeTab, setActiveTab] = useState('form-1');
+  const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+  const [formToClose, setFormToClose] = useState<string | null>(null);
 
   const addNewForm = () => {
     const newFormId = `form-${Date.now()}`;
@@ -50,6 +53,23 @@ export function ProductionTabs() {
     });
   };
 
+  const hasFormData = (form: ProductionFormData): boolean => {
+    // Check if production info has data
+    const hasProductionInfo = !!form.productionSite || !!form.operatorName || !!form.workOrderNumber || 
+                            !!form.resinCode || !!form.colorCode || !!form.productionLine;
+    
+    // Check if target specs have data
+    const hasTargetSpecs = Object.values(form.targetSpecs).some(val => val !== '' && val !== 0);
+    
+    // Check if entries have data
+    const hasEntryData = form.entries.some(entry => 
+      !!entry.start || !!entry.end || typeof entry.odAverage === 'number' || 
+      typeof entry.unitStart === 'number' || !!entry.visual || !!entry.print
+    );
+    
+    return hasProductionInfo || hasTargetSpecs || hasEntryData;
+  };
+
   const closeForm = (formId: string) => {
     if (forms.length === 1) {
       toast({
@@ -60,6 +80,17 @@ export function ProductionTabs() {
       return;
     }
 
+    const form = forms.find(f => f.id === formId);
+    if (form && hasFormData(form)) {
+      setFormToClose(formId);
+      setCloseDialogOpen(true);
+      return;
+    }
+
+    performCloseForm(formId);
+  };
+
+  const performCloseForm = (formId: string) => {
     const formIndex = forms.findIndex(form => form.id === formId);
     const updatedForms = forms.filter(form => form.id !== formId);
     setForms(updatedForms);
@@ -74,6 +105,9 @@ export function ProductionTabs() {
       title: "Form Closed",
       description: "Production form has been closed.",
     });
+    
+    setCloseDialogOpen(false);
+    setFormToClose(null);
   };
 
   const updateForm = (formId: string, updatedFormData: ProductionFormData) => {
@@ -83,8 +117,8 @@ export function ProductionTabs() {
   };
 
   const getFormDisplayName = (form: ProductionFormData, index: number) => {
-    if (form.productionLine && form.shift) {
-      return `${form.productionLine} - ${form.shift}`;
+    if (form.workOrderNumber && form.shift && form.productionLine) {
+      return `${form.workOrderNumber}-${form.shift}${form.productionLine}`;
     }
     return `Form ${index + 1}`;
   };
@@ -94,25 +128,27 @@ export function ProductionTabs() {
       <div className="p-4">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <Factory className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">
-              Production Quality Control System
-            </h1>
-          </div>
-          <p className="text-muted-foreground">
-            Multi-form production monitoring and quality assurance
-          </p>
+          <h1 className="text-3xl font-bold text-foreground">
+            Production Inspection Submission
+          </h1>
+        </div>
+
+        {/* New Form Button */}
+        <div className="mb-4">
+          <Button onClick={addNewForm} variant="outline" size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            New Form
+          </Button>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex items-center justify-between mb-4">
-            <TabsList className="h-auto p-1 bg-muted">
+          <div className="mb-4">
+            <TabsList className="h-auto p-1 bg-muted flex w-full">
               {forms.map((form, index) => (
-                <div key={form.id} className="flex items-center">
+                <div key={form.id} className="relative flex-1">
                   <TabsTrigger 
                     value={form.id} 
-                    className="relative pr-8 data-[state=active]:bg-background data-[state=active]:text-foreground"
+                    className="relative w-full pr-8 data-[state=active]:bg-background data-[state=active]:text-foreground"
                   >
                     {getFormDisplayName(form, index)}
                     {forms.length > 1 && (
@@ -132,11 +168,6 @@ export function ProductionTabs() {
                 </div>
               ))}
             </TabsList>
-            
-            <Button onClick={addNewForm} variant="outline" size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              New Form
-            </Button>
           </div>
 
           {forms.map((form) => (
@@ -148,6 +179,24 @@ export function ProductionTabs() {
             </TabsContent>
           ))}
         </Tabs>
+
+        {/* Close Confirmation Dialog */}
+        <AlertDialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Close Form?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This form contains data. Are you sure you want to close it? All unsaved data will be lost.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setCloseDialogOpen(false)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => formToClose && performCloseForm(formToClose)}>
+                Close Form
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

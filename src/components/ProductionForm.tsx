@@ -178,18 +178,6 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   return (
     <div className="min-h-screen bg-background p-4 space-y-6">
       <div className="max-w-full mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <Factory className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">
-              Production Quality Control Form
-            </h1>
-          </div>
-          <p className="text-muted-foreground">
-            Real-time production monitoring and quality assurance
-          </p>
-        </div>
 
         {/* Form Header */}
         <ProductionHeader
@@ -211,6 +199,8 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
           onResinCodeChange={(value) => handleFieldChange('resinCode', value)}
           onColorCodeChange={(value) => handleFieldChange('colorCode', value)}
           onQRScanClick={() => setShowQRScanner(true)}
+          onTargetSpecsChange={handleTargetSpecsChange}
+          isProductionInfoComplete={!!(formData.productionSite && formData.shift && formData.operatorName && formData.productionLine)}
         />
 
         {/* Statistics Summary */}
@@ -272,17 +262,12 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button onClick={handleSave} className="bg-primary hover:bg-primary-hover">
                   <Save className="mr-2 h-4 w-4" />
-                  Save Form
+                  Submit
                 </Button>
                 <Button onClick={handleExport} variant="outline">
                   <Download className="mr-2 h-4 w-4" />
                   Export Data
                 </Button>
-              </div>
-              <Button onClick={handleReset} variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Reset Form
-              </Button>
             </div>
           </CardContent>
         </Card>

@@ -15,17 +15,17 @@
     --popover: 0 0% 100%;  
     --popover-foreground: 215 25% 15%;
 
-    --primary: 210 85% 45%;
+    --primary: 142 76% 36%;
     --primary-foreground: 210 40% 98%;
-    --primary-hover: 210 85% 40%;
+    --primary-hover: 142 76% 32%;
 
-    --secondary: 210 40% 94%;
+    --secondary: 142 76% 95%;
     --secondary-foreground: 215 25% 25%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 15% 50%;
 
-    --accent: 210 40% 94%;
+    --accent: 142 76% 94%;
     --accent-foreground: 215 25% 15%;
 
     --destructive: 0 84% 60%;
@@ -41,11 +41,11 @@
 
     --border: 214 32% 88%;
     --input: 214 32% 91%;
-    --ring: 210 85% 45%;
+    --ring: 142 76% 36%;
 
-    --table-header: 210 40% 94%;
-    --table-row-even: 210 20% 99%;
-    --table-border: 214 32% 90%;
+    --table-header: 142 76% 94%;
+    --table-row-even: 142 76% 99%;
+    --table-border: 142 32% 90%;
 
     --radius: 0.5rem;
 
@@ -58,7 +58,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(210 85% 55%));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(142 76% 45%));
     --shadow-soft: 0 2px 8px -2px hsl(var(--primary) / 0.1);
     --shadow-form: 0 4px 20px -4px hsl(var(--primary) / 0.15);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -74,9 +74,9 @@
     --popover: 215 25% 8%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 85% 55%;
+    --primary: 142 76% 45%;
     --primary-foreground: 215 25% 8%;
-    --primary-hover: 210 85% 50%;
+    --primary-hover: 142 76% 40%;
 
     --secondary: 215 25% 15%;
     --secondary-foreground: 210 40% 98%;
@@ -100,7 +100,7 @@
 
     --border: 215 25% 20%;
     --input: 215 25% 20%;
-    --ring: 210 85% 55%;
+    --ring: 142 76% 45%;
 
     --table-header: 215 25% 15%;
     --table-row-even: 215 25% 10%;
@@ -133,5 +133,18 @@
 
   .status-badge {
     @apply inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium;
+  }
+
+  /* Conditional formatting for production table */
+  .cell-pass {
+    @apply bg-success-light text-success-foreground;
+  }
+
+  .cell-fail {
+    @apply bg-destructive/10 text-destructive-foreground;
+  }
+
+  .cell-loss {
+    @apply bg-warning-light text-warning-foreground;
   }
 }

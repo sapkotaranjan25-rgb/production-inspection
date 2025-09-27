@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, QrCode } from "lucide-react";
+import { CalendarIcon, QrCode, Edit3 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TargetSpecifications } from "@/types/production";
+import { ManualEntry } from "./ManualEntry";
 
 interface ProductionHeaderProps {
   productionSite: string;
@@ -28,6 +31,8 @@ interface ProductionHeaderProps {
   onResinCodeChange: (value: string) => void;
   onColorCodeChange: (value: string) => void;
   onQRScanClick: () => void;
+  onTargetSpecsChange: (targetSpecs: TargetSpecifications) => void;
+  isProductionInfoComplete: boolean;
 }
 
 export function ProductionHeader({
@@ -49,7 +54,14 @@ export function ProductionHeader({
   onResinCodeChange,
   onColorCodeChange,
   onQRScanClick,
+  onTargetSpecsChange,
+  isProductionInfoComplete,
 }: ProductionHeaderProps) {
+  const [showManualEntry, setShowManualEntry] = useState(false);
+
+  const PRODUCTION_SITES = ['Albuquerque', 'Dallas', 'Springfield', 'Lovelady', 'Allendale', 'Woodburn'];
+  const SHIFTS = ['A', 'B', 'C', 'D'];
+  const PRODUCTION_LINES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
   return (
     <div className="space-y-4">
       {/* Production Information */}
@@ -61,13 +73,16 @@ export function ProductionHeader({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="production-site">Production Site *</Label>
-              <Input
-                id="production-site"
-                value={productionSite}
-                onChange={(e) => onProductionSiteChange(e.target.value)}
-                placeholder="Enter production site"
-                required
-              />
+              <Select value={productionSite} onValueChange={onProductionSiteChange}>
+                <SelectTrigger id="production-site">
+                  <SelectValue placeholder="Select production site" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCTION_SITES.map(site => (
+                    <SelectItem key={site} value={site}>{site}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -98,13 +113,16 @@ export function ProductionHeader({
 
             <div className="space-y-2">
               <Label htmlFor="shift">Shift *</Label>
-              <Input
-                id="shift"
-                value={shift}
-                onChange={(e) => onShiftChange(e.target.value)}
-                placeholder="e.g., Day, Night, A, B"
-                required
-              />
+              <Select value={shift} onValueChange={onShiftChange}>
+                <SelectTrigger id="shift">
+                  <SelectValue placeholder="Select shift" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SHIFTS.map(shiftOption => (
+                    <SelectItem key={shiftOption} value={shiftOption}>{shiftOption}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -120,13 +138,16 @@ export function ProductionHeader({
 
             <div className="space-y-2">
               <Label htmlFor="production-line">Production Line *</Label>
-              <Input
-                id="production-line"
-                value={productionLine}
-                onChange={(e) => onProductionLineChange(e.target.value)}
-                placeholder="Enter production line"
-                required
-              />
+              <Select value={productionLine} onValueChange={onProductionLineChange}>
+                <SelectTrigger id="production-line">
+                  <SelectValue placeholder="Select line" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCTION_LINES.map(line => (
+                    <SelectItem key={line} value={line}>{line}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -163,17 +184,32 @@ export function ProductionHeader({
       </Card>
 
       {/* Target Specifications */}
-      <Card className="shadow-[var(--shadow-soft)]">
+      <Card className={`shadow-[var(--shadow-soft)] ${!isProductionInfoComplete ? 'opacity-50' : ''}`}>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Target Specifications</CardTitle>
-            <Button onClick={onQRScanClick} variant="outline" size="sm">
+          <CardTitle className="text-lg">Target Specifications</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowManualEntry(true)} 
+              variant="outline" 
+              size="sm"
+              disabled={!isProductionInfoComplete}
+            >
+              <Edit3 className="mr-2 h-4 w-4" />
+              Manual Entry
+            </Button>
+            <Button 
+              onClick={onQRScanClick} 
+              variant="outline" 
+              size="sm"
+              disabled={!isProductionInfoComplete}
+            >
               <QrCode className="mr-2 h-4 w-4" />
               Scan QR Code
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
+          
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
             <div className="text-center">
               <div className="font-medium text-foreground">OD Avg</div>
@@ -242,6 +278,14 @@ export function ProductionHeader({
           </div>
         </CardContent>
       </Card>
+
+      {/* Manual Entry Dialog */}
+      <ManualEntry
+        isOpen={showManualEntry}
+        onClose={() => setShowManualEntry(false)}
+        onSave={onTargetSpecsChange}
+        currentSpecs={targetSpecs}
+      />
     </div>
   );
 }
