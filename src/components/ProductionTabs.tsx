@@ -148,7 +148,7 @@ export function ProductionTabs() {
                 <div key={form.id} className="relative flex-1">
                   <TabsTrigger 
                     value={form.id} 
-                    className="relative w-full pr-8 data-[state=active]:bg-background data-[state=active]:text-foreground"
+                    className="relative w-full pr-8 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:font-semibold transition-all duration-200"
                   >
                     {getFormDisplayName(form, index)}
                     {forms.length > 1 && (
