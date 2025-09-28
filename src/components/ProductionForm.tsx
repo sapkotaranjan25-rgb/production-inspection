@@ -200,7 +200,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
           onColorCodeChange={(value) => handleFieldChange('colorCode', value)}
           onQRScanClick={() => setShowQRScanner(true)}
           onTargetSpecsChange={handleTargetSpecsChange}
-          isProductionInfoComplete={!!(formData.productionSite && formData.shift && formData.operatorName && formData.productionLine)}
+          isProductionInfoComplete={!!(formData.productionSite && formData.date && formData.shift && formData.operatorName && formData.productionLine && formData.workOrderNumber && formData.resinCode && formData.colorCode)}
         />
 
         {/* Statistics Summary */}

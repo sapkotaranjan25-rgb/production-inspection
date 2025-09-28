@@ -34,11 +34,16 @@ export function ManualEntry({ isOpen, onClose, onSave, currentSpecs }: ManualEnt
   });
 
   const handleInputChange = (field: keyof TargetSpecifications, value: string) => {
-    const processedValue = value === '' || value === '-' ? value : (parseFloat(value) || '');
-    setSpecs(prev => ({
-      ...prev,
-      [field]: processedValue
-    }));
+    // Allow empty string, dash, numbers, and decimal points
+    if (value === '' || value === '-') {
+      setSpecs(prev => ({ ...prev, [field]: value }));
+      return;
+    }
+    
+    // Allow numbers and decimal points, including partial decimals like "1."
+    if (/^\d*\.?\d*$/.test(value)) {
+      setSpecs(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleSave = () => {

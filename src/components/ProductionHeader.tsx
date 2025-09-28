@@ -60,11 +60,14 @@ export function ProductionHeader({
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [isProductionInfoLocked, setIsProductionInfoLocked] = useState(false);
 
+  // Check if ALL 8 production info fields are completed
+  const allProductionInfoComplete = !!(productionSite && date && shift && operatorName && productionLine && workOrderNumber && resinCode && colorCode);
+  
   // Check if any target spec has been filled
   const hasTargetSpecData = Object.values(targetSpecs).some(val => val !== '' && val !== 0);
 
   // Auto-lock production info when user starts adding target specs
-  if (isProductionInfoComplete && hasTargetSpecData && !isProductionInfoLocked) {
+  if (allProductionInfoComplete && hasTargetSpecData && !isProductionInfoLocked) {
     setIsProductionInfoLocked(true);
   }
 
@@ -209,17 +212,15 @@ export function ProductionHeader({
       </Card>
 
       {/* Target Specifications */}
-      <Card className={`shadow-[var(--shadow-soft)] ${!isProductionInfoComplete ? 'opacity-50' : ''}`}>
-        <CardHeader>
+      <Card className={`shadow-[var(--shadow-soft)] ${!allProductionInfoComplete ? 'opacity-50' : ''}`}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-lg">Target Specifications</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Button 
               onClick={() => setShowManualEntry(true)} 
               variant="outline" 
               size="sm"
-              disabled={!isProductionInfoComplete}
+              disabled={!allProductionInfoComplete}
             >
               <Edit3 className="mr-2 h-4 w-4" />
               Manual Entry
@@ -228,12 +229,14 @@ export function ProductionHeader({
               onClick={onQRScanClick} 
               variant="outline" 
               size="sm"
-              disabled={!isProductionInfoComplete}
+              disabled={!allProductionInfoComplete}
             >
               <QrCode className="mr-2 h-4 w-4" />
               Scan QR Code
             </Button>
           </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
             <div className="text-center">
