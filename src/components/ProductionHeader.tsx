@@ -59,6 +59,7 @@ export function ProductionHeader({
 }: ProductionHeaderProps) {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [isProductionInfoLocked, setIsProductionInfoLocked] = useState(false);
+  const [manuallyUnlocked, setManuallyUnlocked] = useState(false);
 
   // Check if ALL 8 production info fields are completed
   const allProductionInfoComplete = !!(productionSite && date && shift && operatorName && productionLine && workOrderNumber && resinCode && colorCode);
@@ -66,10 +67,15 @@ export function ProductionHeader({
   // Check if any target spec has been filled
   const hasTargetSpecData = Object.values(targetSpecs).some(val => val !== '' && val !== 0);
 
-  // Auto-lock production info when user starts adding target specs
-  if (allProductionInfoComplete && hasTargetSpecData && !isProductionInfoLocked) {
+  // Auto-lock production info when user starts adding target specs, but only if not manually unlocked
+  if (allProductionInfoComplete && hasTargetSpecData && !isProductionInfoLocked && !manuallyUnlocked) {
     setIsProductionInfoLocked(true);
   }
+
+  const handleUnlock = () => {
+    setIsProductionInfoLocked(false);
+    setManuallyUnlocked(true);
+  };
 
   const PRODUCTION_SITES = ['Albuquerque', 'Dallas', 'Springfield', 'Lovelady', 'Allendale', 'Woodburn'];
   const SHIFTS = ['A', 'B', 'C', 'D'];
@@ -86,7 +92,7 @@ export function ProductionHeader({
               variant="ghost"
               size="sm"
               className="absolute top-2 right-2 h-8 w-8 p-0"
-              onClick={() => setIsProductionInfoLocked(false)}
+              onClick={handleUnlock}
             >
               <Unlock className="h-4 w-4" />
             </Button>
