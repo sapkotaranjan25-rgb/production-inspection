@@ -134,8 +134,8 @@ export function ProductionTabs() {
         </div>
 
         {/* New Form Button */}
-        <div className="mb-4">
-          <Button onClick={addNewForm} variant="outline" size="sm">
+        <div className="mb-4 flex justify-end">
+          <Button onClick={addNewForm} variant="outline" size="lg" className="bg-[hsl(var(--light-blue))] border-[hsl(var(--light-blue))] text-[hsl(var(--light-blue-foreground))] hover:bg-[hsl(var(--light-blue-hover))] px-6">
             <Plus className="mr-2 h-4 w-4" />
             New Form
           </Button>
@@ -148,7 +148,7 @@ export function ProductionTabs() {
                 <div key={form.id} className="relative flex-1">
                   <TabsTrigger 
                     value={form.id} 
-                    className="relative w-full pr-8 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:font-semibold transition-all duration-200"
+                    className="relative w-full pr-8 data-[state=active]:bg-[hsl(var(--light-blue))] data-[state=active]:text-[hsl(var(--light-blue-foreground))] data-[state=active]:shadow-lg data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:font-semibold transition-all duration-200"
                   >
                     {getFormDisplayName(form, index)}
                     {forms.length > 1 && (

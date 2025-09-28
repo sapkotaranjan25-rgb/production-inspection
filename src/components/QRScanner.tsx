@@ -144,22 +144,18 @@ export function QRScanner({ isOpen, onClose, onScan }: QRScannerProps) {
 
           {/* Manual Input */}
           <div className="space-y-2">
-            <Label htmlFor="manual-qr">Or enter QR data manually:</Label>
             <div className="flex gap-2">
               <Input
                 id="manual-qr"
                 value={manualInput}
                 onChange={(e) => setManualInput(e.target.value)}
-                placeholder="1*^2*^3*^4..."
+                placeholder="Use Barcode scanner here..."
                 className="flex-1"
               />
               <Button onClick={handleManualInput} disabled={!manualInput.trim()}>
-                Parse
+                Add Spec
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Format: 16 values separated by *^ (e.g., 1*^2*^3*^4...)
-            </p>
           </div>
         </div>
       </DialogContent>

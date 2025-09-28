@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, QrCode, Edit3 } from "lucide-react";
+import { CalendarIcon, QrCode, Edit3, Unlock } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -58,22 +58,42 @@ export function ProductionHeader({
   isProductionInfoComplete,
 }: ProductionHeaderProps) {
   const [showManualEntry, setShowManualEntry] = useState(false);
+  const [isProductionInfoLocked, setIsProductionInfoLocked] = useState(false);
+
+  // Check if any target spec has been filled
+  const hasTargetSpecData = Object.values(targetSpecs).some(val => val !== '' && val !== 0);
+
+  // Auto-lock production info when user starts adding target specs
+  if (isProductionInfoComplete && hasTargetSpecData && !isProductionInfoLocked) {
+    setIsProductionInfoLocked(true);
+  }
 
   const PRODUCTION_SITES = ['Albuquerque', 'Dallas', 'Springfield', 'Lovelady', 'Allendale', 'Woodburn'];
   const SHIFTS = ['A', 'B', 'C', 'D'];
   const PRODUCTION_LINES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  
   return (
     <div className="space-y-4">
       {/* Production Information */}
-      <Card className="shadow-[var(--shadow-soft)]">
-        <CardHeader>
+      <Card className={`shadow-[var(--shadow-soft)] ${isProductionInfoLocked ? 'opacity-75' : ''}`}>
+        <CardHeader className="relative">
           <CardTitle className="text-lg">Production Information</CardTitle>
+          {isProductionInfoLocked && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2 h-8 w-8 p-0"
+              onClick={() => setIsProductionInfoLocked(false)}
+            >
+              <Unlock className="h-4 w-4" />
+            </Button>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="production-site">Production Site *</Label>
-              <Select value={productionSite} onValueChange={onProductionSiteChange}>
+              <Select value={productionSite} onValueChange={onProductionSiteChange} disabled={isProductionInfoLocked}>
                 <SelectTrigger id="production-site">
                   <SelectValue placeholder="Select production site" />
                 </SelectTrigger>
@@ -95,6 +115,7 @@ export function ProductionHeader({
                       "w-full justify-start text-left font-normal",
                       !date && "text-muted-foreground"
                     )}
+                    disabled={isProductionInfoLocked}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, "PPP") : "Select date"}
@@ -113,7 +134,7 @@ export function ProductionHeader({
 
             <div className="space-y-2">
               <Label htmlFor="shift">Shift *</Label>
-              <Select value={shift} onValueChange={onShiftChange}>
+              <Select value={shift} onValueChange={onShiftChange} disabled={isProductionInfoLocked}>
                 <SelectTrigger id="shift">
                   <SelectValue placeholder="Select shift" />
                 </SelectTrigger>
@@ -132,13 +153,14 @@ export function ProductionHeader({
                 value={operatorName}
                 onChange={(e) => onOperatorNameChange(e.target.value)}
                 placeholder="Enter operator name"
+                disabled={isProductionInfoLocked}
                 required
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="production-line">Production Line *</Label>
-              <Select value={productionLine} onValueChange={onProductionLineChange}>
+              <Select value={productionLine} onValueChange={onProductionLineChange} disabled={isProductionInfoLocked}>
                 <SelectTrigger id="production-line">
                   <SelectValue placeholder="Select line" />
                 </SelectTrigger>
@@ -157,6 +179,7 @@ export function ProductionHeader({
                 value={workOrderNumber}
                 onChange={(e) => onWorkOrderNumberChange(e.target.value)}
                 placeholder="Enter work order #"
+                disabled={isProductionInfoLocked}
               />
             </div>
 
@@ -167,6 +190,7 @@ export function ProductionHeader({
                 value={resinCode}
                 onChange={(e) => onResinCodeChange(e.target.value)}
                 placeholder="Enter resin code"
+                disabled={isProductionInfoLocked}
               />
             </div>
 
@@ -177,6 +201,7 @@ export function ProductionHeader({
                 value={colorCode}
                 onChange={(e) => onColorCodeChange(e.target.value)}
                 placeholder="Enter color code"
+                disabled={isProductionInfoLocked}
               />
             </div>
           </div>
@@ -213,67 +238,67 @@ export function ProductionHeader({
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
             <div className="text-center">
               <div className="font-medium text-foreground">OD Avg</div>
-              <div className="text-primary">{targetSpecs.odAverage || '-'}</div>
+              <div className="text-primary">{targetSpecs.odAverage || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">OD Max</div>
-              <div className="text-primary">{targetSpecs.odMax || '-'}</div>
+              <div className="text-primary">{targetSpecs.odMax || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">OD Min</div>
-              <div className="text-primary">{targetSpecs.odMin || '-'}</div>
+              <div className="text-primary">{targetSpecs.odMin || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Cal Max</div>
-              <div className="text-primary">{targetSpecs.caliperMaximum || '-'}</div>
+              <div className="text-primary">{targetSpecs.caliperMaximum || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Cal Min</div>
-              <div className="text-primary">{targetSpecs.caliperMinimum || '-'}</div>
+              <div className="text-primary">{targetSpecs.caliperMinimum || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Out Round</div>
-              <div className="text-primary">{targetSpecs.outOfRound || '-'}</div>
+              <div className="text-primary">{targetSpecs.outOfRound || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Ovality</div>
-              <div className="text-primary">{targetSpecs.ovality || '-'}</div>
+              <div className="text-primary">{targetSpecs.ovality || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Toe-in</div>
-              <div className="text-primary">{targetSpecs.toeIn || '-'}</div>
+              <div className="text-primary">{targetSpecs.toeIn || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Wall Min</div>
-              <div className="text-primary">{targetSpecs.wallMin || '-'}</div>
+              <div className="text-primary">{targetSpecs.wallMin || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Wall Max</div>
-              <div className="text-primary">{targetSpecs.wallMax || '-'}</div>
+              <div className="text-primary">{targetSpecs.wallMax || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Target Min</div>
-              <div className="text-primary">{targetSpecs.targetMin || '-'}</div>
+              <div className="text-primary">{targetSpecs.targetMin || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Target Max</div>
-              <div className="text-primary">{targetSpecs.targetMax || '-'}</div>
+              <div className="text-primary">{targetSpecs.targetMax || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Eccentric</div>
-              <div className="text-primary">{targetSpecs.eccentricity || '-'}</div>
+              <div className="text-primary">{targetSpecs.eccentricity || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Goal PPH</div>
-              <div className="text-primary">{targetSpecs.goalPPH || '-'}</div>
+              <div className="text-primary">{targetSpecs.goalPPH || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Theo Wt/Ft</div>
-              <div className="text-primary">{targetSpecs.theoWtPerFt || '-'}</div>
+              <div className="text-primary">{targetSpecs.theoWtPerFt || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Target Gain</div>
-              <div className="text-primary">{targetSpecs.targetGain || '-'}</div>
+              <div className="text-primary">{targetSpecs.targetGain || ''}</div>
             </div>
           </div>
         </CardContent>
