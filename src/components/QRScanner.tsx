@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QrCode, X } from "lucide-react";
@@ -113,6 +113,9 @@ export function QRScanner({ isOpen, onClose, onScan }: QRScannerProps) {
             <QrCode className="h-5 w-5" />
             Scan QR Code for Target Specifications
           </DialogTitle>
+          <DialogDescription>
+            Use your device camera to scan a QR code or enter the data manually below.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">

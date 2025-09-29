@@ -2,14 +2,107 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProductionEntry, VISUAL_OPTIONS, PRINT_OPTIONS, DIE_HEAD_OPTIONS, SCRAP_CODES } from "@/types/production";
+import { ProductionEntry, TargetSpecifications, VISUAL_OPTIONS, PRINT_OPTIONS, DIE_HEAD_OPTIONS, SCRAP_CODES } from "@/types/production";
 
 interface ProductionTableProps {
   entries: ProductionEntry[];
+  targetSpecs: TargetSpecifications;
   onEntryChange: (index: number, field: keyof ProductionEntry, value: string | number) => void;
 }
 
-export function ProductionTable({ entries, onEntryChange }: ProductionTableProps) {
+export function ProductionTable({ entries, targetSpecs, onEntryChange }: ProductionTableProps) {
+  // Check if all target specs are filled or contain "-"
+  const isTargetSpecsComplete = () => {
+    return Object.values(targetSpecs).every(value => value !== '' && value !== 0);
+  };
+
+  // Calculate gain/loss for display
+  const calculateGainLoss = (entry: ProductionEntry): { gain: number; loss: number; isGain: boolean } => {
+    const actualWt = parseFloat(entry.actualWtPerFt?.toString() || '0');
+    const theoWt = parseFloat(targetSpecs.theoWtPerFt?.toString() || '0');
+    
+    if (actualWt === 0 || theoWt === 0) {
+      return { gain: 0, loss: 0, isGain: true };
+    }
+    
+    const calculatedValue = ((actualWt - theoWt) / theoWt) * 100;
+    const isGain = calculatedValue < 0;
+    const absValue = Math.abs(calculatedValue);
+    
+    return {
+      gain: isGain ? absValue : 0,
+      loss: !isGain ? absValue : 0,
+      isGain
+    };
+  };
+
+  // Conditional formatting helper
+  const getConditionalFormatting = (value: string | number, field: string): string => {
+    if (!value || value === '' || value === 0) return '';
+    
+    const numValue = parseFloat(value.toString());
+    if (isNaN(numValue)) return '';
+    
+    switch (field) {
+      case 'odAverage':
+        const odMax = parseFloat(targetSpecs.odMax?.toString() || '0');
+        const odMin = parseFloat(targetSpecs.odMin?.toString() || '0');
+        if (targetSpecs.odMax?.toString() === '-' || targetSpecs.odMin?.toString() === '-' || odMax === 0 || odMin === 0) return '';
+        return numValue >= odMin && numValue <= odMax ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'odMaximum':
+      case 'odMinimum':
+        const calMax = parseFloat(targetSpecs.caliperMaximum?.toString() || '0');
+        const calMin = parseFloat(targetSpecs.caliperMinimum?.toString() || '0');
+        if (targetSpecs.caliperMaximum?.toString() === '-' || targetSpecs.caliperMinimum?.toString() === '-' || calMax === 0 || calMin === 0) return '';
+        return numValue >= calMin && numValue <= calMax ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'outOfRound':
+        const outRound = parseFloat(targetSpecs.outOfRound?.toString() || '0');
+        if (targetSpecs.outOfRound?.toString() === '-' || outRound === 0) return '';
+        return numValue <= outRound ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'ovality':
+        const ovality = parseFloat(targetSpecs.ovality?.toString() || '0');
+        if (targetSpecs.ovality?.toString() === '-' || ovality === 0) return '';
+        return numValue <= ovality ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'toeIn':
+        const toeIn = parseFloat(targetSpecs.toeIn?.toString() || '0');
+        if (targetSpecs.toeIn?.toString() === '-' || toeIn === 0) return '';
+        return numValue <= toeIn ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'wallMinimum':
+      case 'wallMaximum':
+        const wallMax = parseFloat(targetSpecs.wallMax?.toString() || '0');
+        const wallMin = parseFloat(targetSpecs.wallMin?.toString() || '0');
+        if (targetSpecs.wallMax?.toString() === '-' || targetSpecs.wallMin?.toString() === '-' || wallMax === 0 || wallMin === 0) return '';
+        return numValue >= wallMin && numValue <= wallMax ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'eccentricity':
+        const eccentric = parseFloat(targetSpecs.eccentricity?.toString() || '0');
+        if (targetSpecs.eccentricity?.toString() === '-' || eccentric === 0) return '';
+        return numValue <= eccentric ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'visual':
+      case 'print':
+        if (value === 'Pass') return 'bg-success-light';
+        if (value === 'Fail') return 'bg-destructive/10';
+        return '';
+        
+      case 'gain':
+        const targetGain = parseFloat(targetSpecs.targetGain?.toString() || '0');
+        if (targetSpecs.targetGain?.toString() === '-' || targetGain === 0) return '';
+        return numValue <= targetGain ? 'bg-success-light' : 'bg-destructive/10';
+        
+      case 'loss':
+        return 'bg-warning-light'; // Always yellow for loss
+        
+      default:
+        return '';
+    }
+  };
+
   const formatNumber = (value: number | '', decimals: number = 3): string => {
     if (value === '' || isNaN(Number(value))) return '';
     return Number(value).toFixed(decimals);
@@ -62,6 +155,13 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
     onEntryChange(index, field, processedValue);
   };
 
+  const handleSelectChange = (index: number, field: keyof ProductionEntry, value: string) => {
+    // Allow deselection by selecting the same value again
+    const currentValue = entries[index][field];
+    const newValue = currentValue === value ? '' : value;
+    onEntryChange(index, field, newValue);
+  };
+
   return (
     <Card className="shadow-[var(--shadow-soft)]">
       <CardContent className="p-0">
@@ -72,9 +172,9 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                 <TableHead className="text-center min-w-[80px]">Start</TableHead>
                 <TableHead className="text-center min-w-[80px]">End</TableHead>
                 <TableHead className="text-center min-w-[90px]">OD Avg</TableHead>
-                <TableHead className="text-center min-w-[90px]">OD Max</TableHead>
-                <TableHead className="text-center min-w-[90px]">OD Min</TableHead>
-                <TableHead className="text-center min-w-[90px]">Out Round</TableHead>
+                <TableHead className="text-center min-w-[90px]">Caliper Max</TableHead>
+                <TableHead className="text-center min-w-[90px]">Caliper Min</TableHead>
+                <TableHead className="text-center min-w-[90px]">OOR</TableHead>
                 <TableHead className="text-center min-w-[80px]">Ovality</TableHead>
                 <TableHead className="text-center min-w-[80px]">OD End</TableHead>
                 <TableHead className="text-center min-w-[70px]">Toe-in</TableHead>
@@ -102,7 +202,12 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
               </TableRow>
             </TableHeader>
             <TableBody>
-              {entries.map((entry, index) => (
+              {entries.map((entry, index) => {
+                const isFirstRow = index === 0;
+                const shouldLockFirstRow = isFirstRow && !isTargetSpecsComplete();
+                const gainLossData = calculateGainLoss(entry);
+                
+                return (
                 <TableRow key={index} className="hover:bg-muted/30">
                   <TableCell className="p-1">
                     <Input
@@ -110,6 +215,7 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       value={entry.start}
                       onChange={(e) => handleChange(index, 'start', e.target.value)}
                       className="text-xs h-8"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -126,7 +232,8 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       step="0.001"
                       value={entry.odAverage}
                       onChange={(e) => handleChange(index, 'odAverage', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odAverage, 'odAverage')}`}
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -135,7 +242,8 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       step="0.001"
                       value={entry.odMaximum}
                       onChange={(e) => handleChange(index, 'odMaximum', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odMaximum, 'odMaximum')}`}
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -144,16 +252,17 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       step="0.001"
                       value={entry.odMinimum}
                       onChange={(e) => handleChange(index, 'odMinimum', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odMinimum, 'odMinimum')}`}
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className="text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground">
+                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'outOfRound'), 'outOfRound')}`}>
                       {formatNumber(calculateField(entry, 'outOfRound'))}
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className="text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground">
+                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'ovality'), 'ovality')}`}>
                       {formatNumber(calculateField(entry, 'ovality'))}
                     </div>
                   </TableCell>
@@ -164,10 +273,11 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       value={entry.odEnd}
                       onChange={(e) => handleChange(index, 'odEnd', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className="text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground">
+                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'toeIn'), 'toeIn')}`}>
                       {formatNumber(calculateField(entry, 'toeIn'))}
                     </div>
                   </TableCell>
@@ -177,7 +287,8 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       step="0.001"
                       value={entry.wallMinimum}
                       onChange={(e) => handleChange(index, 'wallMinimum', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.wallMinimum, 'wallMinimum')}`}
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -186,20 +297,22 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                       step="0.001"
                       value={entry.wallMaximum}
                       onChange={(e) => handleChange(index, 'wallMaximum', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.wallMaximum, 'wallMaximum')}`}
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className="text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground">
+                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'eccentricity'), 'eccentricity')}`}>
                       {formatNumber(calculateField(entry, 'eccentricity'))}
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.visual} onValueChange={(value) => handleChange(index, 'visual', value)}>
-                      <SelectTrigger className="text-xs h-8">
+                    <Select value={entry.visual} onValueChange={(value) => handleSelectChange(index, 'visual', value)}>
+                      <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.visual, 'visual')}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="">Clear</SelectItem>
                         {VISUAL_OPTIONS.map(option => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
@@ -207,11 +320,12 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                     </Select>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.print} onValueChange={(value) => handleChange(index, 'print', value)}>
-                      <SelectTrigger className="text-xs h-8">
+                    <Select value={entry.print} onValueChange={(value) => handleSelectChange(index, 'print', value)}>
+                      <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.print, 'print')}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="">Clear</SelectItem>
                         {PRINT_OPTIONS.map(option => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
@@ -292,22 +406,14 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <Input
-                      type="number"
-                      step="0.001"
-                      value={entry.gain}
-                      onChange={(e) => handleChange(index, 'gain', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
+                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(gainLossData.gain, 'gain')}`}>
+                      {gainLossData.gain > 0 ? gainLossData.gain.toFixed(2) : ''}
+                    </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Input
-                      type="number"
-                      step="0.001"
-                      value={entry.loss}
-                      onChange={(e) => handleChange(index, 'loss', e.target.value)}
-                      className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
+                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(gainLossData.loss, 'loss')}`}>
+                      {gainLossData.loss > 0 ? gainLossData.loss.toFixed(2) : ''}
+                    </div>
                   </TableCell>
                   <TableCell className="p-1">
                     <Input
@@ -365,7 +471,8 @@ export function ProductionTable({ entries, onEntryChange }: ProductionTableProps
                     />
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </div>

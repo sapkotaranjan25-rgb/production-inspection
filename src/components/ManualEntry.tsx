@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Edit3 } from "lucide-react";
@@ -82,6 +82,9 @@ export function ManualEntry({ isOpen, onClose, onSave, currentSpecs }: ManualEnt
             <Edit3 className="h-5 w-5" />
             Manual Target Specifications Entry
           </DialogTitle>
+          <DialogDescription>
+            Enter target specification values manually. Leave fields empty or use "-" for values that don't apply.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-2 gap-4 py-4">

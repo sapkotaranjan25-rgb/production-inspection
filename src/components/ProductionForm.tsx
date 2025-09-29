@@ -270,7 +270,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
         </Card>
 
         {/* Production Table */}
-        <ProductionTable entries={formData.entries} onEntryChange={handleEntryChange} />
+        <ProductionTable entries={formData.entries} targetSpecs={formData.targetSpecs} onEntryChange={handleEntryChange} />
 
         {/* Entry Management */}
         <Card className="shadow-[var(--shadow-soft)]">
