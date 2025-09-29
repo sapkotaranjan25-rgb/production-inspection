@@ -72,6 +72,15 @@ export function ProductionHeader({
     setIsProductionInfoLocked(true);
   }
 
+  const handleTargetSpecsChange = (targetSpecs: TargetSpecifications) => {
+    // Re-lock production info when target specs change
+    if (allProductionInfoComplete) {
+      setIsProductionInfoLocked(true);
+      setManuallyUnlocked(false);
+    }
+    onTargetSpecsChange(targetSpecs);
+  };
+
   const handleUnlock = () => {
     setIsProductionInfoLocked(false);
     setManuallyUnlocked(true);
@@ -232,7 +241,7 @@ export function ProductionHeader({
               Manual Entry
             </Button>
             <Button 
-              onClick={onQRScanClick} 
+              onClick={() => onQRScanClick()} 
               variant="outline" 
               size="sm"
               disabled={!allProductionInfoComplete}
@@ -317,7 +326,7 @@ export function ProductionHeader({
       <ManualEntry
         isOpen={showManualEntry}
         onClose={() => setShowManualEntry(false)}
-        onSave={onTargetSpecsChange}
+        onSave={(specs) => handleTargetSpecsChange(specs)}
         currentSpecs={targetSpecs}
       />
     </div>

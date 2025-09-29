@@ -175,6 +175,32 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     entry.start !== '' || entry.odAverage !== '' || entry.unitStart !== ''
   ).length;
 
+  // Calculate average actual weight per foot
+  const validActualWtPerFt = formData.entries
+    .map(entry => parseFloat(entry.actualWtPerFt?.toString() || '0'))
+    .filter(value => !isNaN(value) && value > 0);
+  
+  const avgActualWtPerFt = validActualWtPerFt.length > 0 
+    ? validActualWtPerFt.reduce((sum, value) => sum + value, 0) / validActualWtPerFt.length 
+    : 0;
+
+  // Calculate Gain/Loss
+  const theoWtPerFt = parseFloat(formData.targetSpecs.theoWtPerFt?.toString() || '0');
+  let gainLossValue = 0;
+  let gainLossLabel = '';
+  
+  if (theoWtPerFt > 0 && avgActualWtPerFt > 0) {
+    gainLossValue = ((avgActualWtPerFt - theoWtPerFt) / theoWtPerFt) * 100;
+    gainLossLabel = gainLossValue < 0 ? 'Gain' : 'Loss';
+  }
+
+  // Calculate Total Units
+  const totalUnits = formData.entries.reduce((sum, entry) => {
+    const unitStart = parseFloat(entry.unitStart?.toString() || '0');
+    const unitEnd = parseFloat(entry.unitEnd?.toString() || '0');
+    return sum + Math.abs(unitEnd - unitStart);
+  }, 0);
+
   return (
     <div className="min-h-screen bg-background p-4 space-y-6">
       <div className="max-w-full mx-auto">
@@ -206,7 +232,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
         {/* Statistics Summary */}
         <Card className="shadow-[var(--shadow-soft)]">
           <CardContent className="p-4">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-7 gap-4 text-center">
               <div className="space-y-1">
                 <div className="text-2xl font-bold text-primary">{completedEntries}</div>
                 <div className="text-sm text-muted-foreground">Entries</div>
@@ -226,6 +252,18 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
               <div className="space-y-1">
                 <div className="text-2xl font-bold text-warning">{totals.scrapFts}</div>
                 <div className="text-sm text-muted-foreground">Scrap Fts</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-destructive">
+                  {theoWtPerFt > 0 && avgActualWtPerFt > 0 ? `${Math.abs(gainLossValue).toFixed(2)}%` : '0%'}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {gainLossLabel || 'Gain/Loss'}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-primary">{totalUnits.toFixed(0)}</div>
+                <div className="text-sm text-muted-foreground">Total Units</div>
               </div>
             </div>
           </CardContent>

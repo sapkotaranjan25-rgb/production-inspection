@@ -28,9 +28,10 @@
     --accent: 142 76% 94%;
     --accent-foreground: 215 25% 15%;
 
-    --light-blue: 197 71% 73%;
-    --light-blue-foreground: 215 25% 15%;
-    --light-blue-hover: 197 71% 68%;
+    --light-blue: 200 100% 85%;
+    --light-blue-light: 200 50% 93%;
+    --light-blue-foreground: 200 100% 15%;
+    --light-blue-hover: 200 100% 80%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
@@ -91,9 +92,10 @@
     --accent: 215 25% 15%;
     --accent-foreground: 210 40% 98%;
 
-    --light-blue: 197 71% 40%;
+    --light-blue: 200 100% 30%;
+    --light-blue-light: 200 50% 93%;
     --light-blue-foreground: 210 40% 98%;
-    --light-blue-hover: 197 71% 35%;
+    --light-blue-hover: 200 100% 25%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;

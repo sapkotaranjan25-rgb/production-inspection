@@ -42,6 +42,15 @@ export function ProductionTabs() {
   const [formToClose, setFormToClose] = useState<string | null>(null);
 
   const addNewForm = () => {
+    if (forms.length >= 12) {
+      toast({
+        title: "Maximum Forms Reached",
+        description: "You can have a maximum of 12 forms open at once.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newFormId = `form-${Date.now()}`;
     const newForm = generateInitialFormData(newFormId);
     setForms(prev => [...prev, newForm]);
@@ -133,41 +142,50 @@ export function ProductionTabs() {
           </h1>
         </div>
 
-        {/* New Form Button */}
-        <div className="mb-4 flex justify-end">
-          <Button onClick={addNewForm} variant="outline" size="lg" className="bg-[hsl(var(--light-blue))] border-[hsl(var(--light-blue))] text-[hsl(var(--light-blue-foreground))] hover:bg-[hsl(var(--light-blue-hover))] px-6">
-            <Plus className="mr-2 h-4 w-4" />
-            New Form
-          </Button>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="mb-4">
-            <TabsList className="h-auto p-1 bg-muted flex w-full">
-              {forms.map((form, index) => (
-                <div key={form.id} className="relative flex-1">
-                  <TabsTrigger 
-                    value={form.id} 
-                    className="relative w-full pr-8 data-[state=active]:bg-[hsl(var(--light-blue))] data-[state=active]:text-[hsl(var(--light-blue-foreground))] data-[state=active]:shadow-lg data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:font-semibold transition-all duration-200"
-                  >
-                    {getFormDisplayName(form, index)}
-                    {forms.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          closeForm(form.id);
-                        }}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </TabsTrigger>
-                </div>
-              ))}
-            </TabsList>
+          <div className="mb-4 flex gap-4">
+            {/* Form Tabs - 80% width */}
+            <div className="flex-1" style={{flexBasis: '80%'}}>
+              <TabsList className="h-auto p-1 bg-muted flex w-full gap-2">
+                {forms.map((form, index) => (
+                  <div key={form.id} className="relative flex-1">
+                    <TabsTrigger 
+                      value={form.id} 
+                      className="relative w-full pr-8 data-[state=active]:bg-[hsl(var(--light-blue-light))] data-[state=active]:text-[hsl(var(--light-blue-foreground))] data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-[hsl(var(--success))] data-[state=active]:font-semibold transition-all duration-200"
+                    >
+                      {getFormDisplayName(form, index)}
+                      {forms.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            closeForm(form.id);
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </TabsTrigger>
+                  </div>
+                ))}
+              </TabsList>
+            </div>
+            
+            {/* New Form Button - 20% width with gap */}
+            <div className="ml-6" style={{flexBasis: '20%'}}>
+              <Button 
+                onClick={addNewForm} 
+                variant="outline" 
+                size="lg" 
+                className="w-full bg-[hsl(var(--light-blue))] border-[hsl(var(--light-blue))] text-[hsl(var(--light-blue-foreground))] hover:bg-[hsl(var(--light-blue-hover))] px-6"
+                disabled={forms.length >= 12}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                New Form
+              </Button>
+            </div>
           </div>
 
           {forms.map((form) => (
