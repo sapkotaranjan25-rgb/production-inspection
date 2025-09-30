@@ -48,55 +48,55 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
         const odMax = parseFloat(targetSpecs.odMax?.toString() || '0');
         const odMin = parseFloat(targetSpecs.odMin?.toString() || '0');
         if (targetSpecs.odMax?.toString() === '-' || targetSpecs.odMin?.toString() === '-' || odMax === 0 || odMin === 0) return '';
-        return numValue >= odMin && numValue <= odMax ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue >= odMin && numValue <= odMax ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'odMaximum':
       case 'odMinimum':
         const calMax = parseFloat(targetSpecs.caliperMaximum?.toString() || '0');
         const calMin = parseFloat(targetSpecs.caliperMinimum?.toString() || '0');
         if (targetSpecs.caliperMaximum?.toString() === '-' || targetSpecs.caliperMinimum?.toString() === '-' || calMax === 0 || calMin === 0) return '';
-        return numValue >= calMin && numValue <= calMax ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue >= calMin && numValue <= calMax ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'outOfRound':
         const outRound = parseFloat(targetSpecs.outOfRound?.toString() || '0');
         if (targetSpecs.outOfRound?.toString() === '-' || outRound === 0) return '';
-        return numValue <= outRound ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue <= outRound ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'ovality':
         const ovality = parseFloat(targetSpecs.ovality?.toString() || '0');
         if (targetSpecs.ovality?.toString() === '-' || ovality === 0) return '';
-        return numValue <= ovality ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue <= ovality ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'toeIn':
         const toeIn = parseFloat(targetSpecs.toeIn?.toString() || '0');
         if (targetSpecs.toeIn?.toString() === '-' || toeIn === 0) return '';
-        return numValue <= toeIn ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue <= toeIn ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'wallMinimum':
       case 'wallMaximum':
         const wallMax = parseFloat(targetSpecs.wallMax?.toString() || '0');
         const wallMin = parseFloat(targetSpecs.wallMin?.toString() || '0');
         if (targetSpecs.wallMax?.toString() === '-' || targetSpecs.wallMin?.toString() === '-' || wallMax === 0 || wallMin === 0) return '';
-        return numValue >= wallMin && numValue <= wallMax ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue >= wallMin && numValue <= wallMax ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'eccentricity':
         const eccentric = parseFloat(targetSpecs.eccentricity?.toString() || '0');
         if (targetSpecs.eccentricity?.toString() === '-' || eccentric === 0) return '';
-        return numValue <= eccentric ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue <= eccentric ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'visual':
       case 'print':
-        if (value === 'Pass') return 'bg-success-light';
-        if (value === 'Fail') return 'bg-destructive/10';
+        if (value === 'Pass') return 'bg-green-600/50';
+        if (value === 'Fail') return 'bg-red-600/50';
         return '';
         
       case 'gain':
         const targetGain = parseFloat(targetSpecs.targetGain?.toString() || '0');
         if (targetSpecs.targetGain?.toString() === '-' || targetGain === 0) return '';
-        return numValue <= targetGain ? 'bg-success-light' : 'bg-destructive/10';
+        return numValue <= targetGain ? 'bg-green-600/50' : 'bg-red-600/50';
         
       case 'loss':
-        return 'bg-warning-light'; // Always yellow for loss
+        return 'bg-yellow-600/50'; // Always yellow for loss
         
       default:
         return '';
