@@ -13,7 +13,7 @@ interface ProductionTableProps {
 export function ProductionTable({ entries, targetSpecs, onEntryChange }: ProductionTableProps) {
   // Check if all target specs are filled or contain "-"
   const isTargetSpecsComplete = () => {
-    return Object.values(targetSpecs).every(value => value !== '' && value !== '-');
+    return Object.values(targetSpecs).every(value => value !== '');
   };
 
   // Calculate gain/loss for display
@@ -48,52 +48,52 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
         const odMax = parseFloat(targetSpecs.odMax?.toString() || '0');
         const odMin = parseFloat(targetSpecs.odMin?.toString() || '0');
         if (targetSpecs.odMax?.toString() === '-' || targetSpecs.odMin?.toString() === '-' || odMax === 0 || odMin === 0) return '';
-        return numValue >= odMin && numValue <= odMax ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue >= odMin && numValue <= odMax ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'odMaximum':
       case 'odMinimum':
         const calMax = parseFloat(targetSpecs.caliperMaximum?.toString() || '0');
         const calMin = parseFloat(targetSpecs.caliperMinimum?.toString() || '0');
         if (targetSpecs.caliperMaximum?.toString() === '-' || targetSpecs.caliperMinimum?.toString() === '-' || calMax === 0 || calMin === 0) return '';
-        return numValue >= calMin && numValue <= calMax ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue >= calMin && numValue <= calMax ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'outOfRound':
         const outRound = parseFloat(targetSpecs.outOfRound?.toString() || '0');
         if (targetSpecs.outOfRound?.toString() === '-' || outRound === 0) return '';
-        return numValue <= outRound ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue <= outRound ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'ovality':
         const ovality = parseFloat(targetSpecs.ovality?.toString() || '0');
         if (targetSpecs.ovality?.toString() === '-' || ovality === 0) return '';
-        return numValue <= ovality ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue <= ovality ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'toeIn':
         const toeIn = parseFloat(targetSpecs.toeIn?.toString() || '0');
         if (targetSpecs.toeIn?.toString() === '-' || toeIn === 0) return '';
-        return numValue <= toeIn ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue <= toeIn ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'wallMinimum':
       case 'wallMaximum':
         const wallMax = parseFloat(targetSpecs.wallMax?.toString() || '0');
         const wallMin = parseFloat(targetSpecs.wallMin?.toString() || '0');
         if (targetSpecs.wallMax?.toString() === '-' || targetSpecs.wallMin?.toString() === '-' || wallMax === 0 || wallMin === 0) return '';
-        return numValue >= wallMin && numValue <= wallMax ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue >= wallMin && numValue <= wallMax ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'eccentricity':
         const eccentric = parseFloat(targetSpecs.eccentricity?.toString() || '0');
         if (targetSpecs.eccentricity?.toString() === '-' || eccentric === 0) return '';
-        return numValue <= eccentric ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue <= eccentric ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'visual':
       case 'print':
         if (value === 'Pass') return 'bg-green-600/50';
-        if (value === 'Fail') return 'bg-red-600/70';
+        if (value === 'Fail') return 'bg-red-600/80';
         return '';
         
       case 'gain':
         const targetGain = parseFloat(targetSpecs.targetGain?.toString() || '0');
         if (targetSpecs.targetGain?.toString() === '-' || targetGain === 0) return '';
-        return numValue <= targetGain ? 'bg-green-600/50' : 'bg-red-600/70';
+        return numValue <= targetGain ? 'bg-green-600/50' : 'bg-red-600/80';
         
       case 'loss':
         return 'bg-yellow-600/50'; // Always yellow for loss
@@ -223,6 +223,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.end}
                       onChange={(e) => handleChange(index, 'end', e.target.value)}
                       className="text-xs h-8"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -306,7 +307,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.visual || 'none'} onValueChange={(value) => handleSelectChange(index, 'visual', value)}>
+                    <Select value={entry.visual || 'none'} onValueChange={(value) => handleSelectChange(index, 'visual', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.visual, 'visual')}`}>
                         <SelectValue />
                       </SelectTrigger>
@@ -319,7 +320,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </Select>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.print || 'none'} onValueChange={(value) => handleSelectChange(index, 'print', value)}>
+                    <Select value={entry.print || 'none'} onValueChange={(value) => handleSelectChange(index, 'print', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.print, 'print')}`}>
                         <SelectValue />
                       </SelectTrigger>
@@ -338,6 +339,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odAtSaw}
                       onChange={(e) => handleChange(index, 'odAtSaw', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -347,6 +349,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odAtVacTank}
                       onChange={(e) => handleChange(index, 'odAtVacTank', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -356,10 +359,11 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.meltPress}
                       onChange={(e) => handleChange(index, 'meltPress', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.dieHeadClean} onValueChange={(value) => handleChange(index, 'dieHeadClean', value)}>
+                    <Select value={entry.dieHeadClean} onValueChange={(value) => handleChange(index, 'dieHeadClean', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className="text-xs h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -376,6 +380,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.unitStart}
                       onChange={(e) => handleChange(index, 'unitStart', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -384,6 +389,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.unitEnd}
                       onChange={(e) => handleChange(index, 'unitEnd', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -393,6 +399,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.actualPPH}
                       onChange={(e) => handleChange(index, 'actualPPH', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -402,6 +409,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.actualWtPerFt}
                       onChange={(e) => handleChange(index, 'actualWtPerFt', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -420,6 +428,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.acceptedFt}
                       onChange={(e) => handleChange(index, 'acceptedFt', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -429,6 +438,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.acceptedLbs}
                       onChange={(e) => handleChange(index, 'acceptedLbs', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -437,6 +447,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.scrapFts}
                       onChange={(e) => handleChange(index, 'scrapFts', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -446,10 +457,11 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.scrapLbs}
                       onChange={(e) => handleChange(index, 'scrapLbs', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.scrapCode} onValueChange={(value) => handleChange(index, 'scrapCode', value)}>
+                    <Select value={entry.scrapCode} onValueChange={(value) => handleChange(index, 'scrapCode', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className="text-xs h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -467,6 +479,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.regrindConsumed}
                       onChange={(e) => handleChange(index, 'regrindConsumed', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={shouldLockFirstRow}
                     />
                   </TableCell>
                 </TableRow>
