@@ -156,9 +156,8 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
   };
 
   const handleSelectChange = (index: number, field: keyof ProductionEntry, value: string) => {
-    // Allow deselection by selecting the same value again
-    const currentValue = entries[index][field];
-    const newValue = currentValue === value ? '' : value;
+    // Convert "none" to empty string for clearing selection
+    const newValue = value === 'none' ? '' : value;
     onEntryChange(index, field, newValue);
   };
 
@@ -307,12 +306,12 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.visual} onValueChange={(value) => handleSelectChange(index, 'visual', value)}>
+                    <Select value={entry.visual || 'none'} onValueChange={(value) => handleSelectChange(index, 'visual', value)}>
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.visual, 'visual')}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Clear</SelectItem>
+                        <SelectItem value="none">Clear</SelectItem>
                         {VISUAL_OPTIONS.map(option => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
@@ -320,12 +319,12 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </Select>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.print} onValueChange={(value) => handleSelectChange(index, 'print', value)}>
+                    <Select value={entry.print || 'none'} onValueChange={(value) => handleSelectChange(index, 'print', value)}>
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.print, 'print')}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Clear</SelectItem>
+                        <SelectItem value="none">Clear</SelectItem>
                         {PRINT_OPTIONS.map(option => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
