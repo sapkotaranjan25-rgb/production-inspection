@@ -133,7 +133,7 @@ export function ProductionTabs() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background overflow-hidden">
       <div className="p-4">
         {/* Header */}
         <div className="text-center mb-6">
@@ -143,15 +143,15 @@ export function ProductionTabs() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="mb-4 flex gap-4">
-            {/* Form Tabs - 80% width */}
-            <div className="flex-1" style={{flexBasis: '80%'}}>
-              <TabsList className="h-auto p-1 bg-muted flex w-full gap-2">
+          <div className="mb-4 flex items-end gap-2">
+            {/* Form Tabs - 90% width */}
+            <div className="flex-1 w-[90%]">
+              <TabsList className="h-12 p-1 bg-muted flex w-full gap-1">
                 {forms.map((form, index) => (
                   <div key={form.id} className="relative flex-1">
                     <TabsTrigger 
                       value={form.id} 
-                      className="relative w-full pr-8 data-[state=active]:bg-[hsl(var(--light-blue-light))] data-[state=active]:text-[hsl(var(--light-blue-foreground))] data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-[hsl(var(--success))] data-[state=active]:font-semibold transition-all duration-200"
+                      className="relative w-full h-10 pr-8 data-[state=active]:bg-[hsl(var(--light-blue-light))] data-[state=active]:text-[hsl(var(--light-blue-foreground))] data-[state=active]:shadow-lg data-[state=active]:border-b-2 data-[state=active]:border-b-[hsl(var(--success))] data-[state=active]:font-semibold transition-all duration-200"
                     >
                       {getFormDisplayName(form, index)}
                       {forms.length > 1 && (
@@ -173,13 +173,12 @@ export function ProductionTabs() {
               </TabsList>
             </div>
             
-            {/* New Form Button - 20% width with gap */}
-            <div className="ml-6" style={{flexBasis: '20%'}}>
+            {/* New Form Button - 10% width with larger gap */}
+            <div className="w-[10%] ml-4">
               <Button 
                 onClick={addNewForm} 
                 variant="outline" 
-                size="lg" 
-                className="w-full bg-[hsl(var(--light-blue))] border-[hsl(var(--light-blue))] text-[hsl(var(--light-blue-foreground))] hover:bg-[hsl(var(--light-blue-hover))] px-6"
+                className="w-full h-12 bg-[hsl(var(--light-blue))] border-[hsl(var(--light-blue))] text-[hsl(var(--light-blue-foreground))] hover:bg-[hsl(var(--light-blue-hover))] px-6"
                 disabled={forms.length >= 12}
               >
                 <Plus className="mr-2 h-4 w-4" />

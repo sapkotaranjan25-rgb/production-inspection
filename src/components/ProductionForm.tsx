@@ -76,6 +76,20 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   };
 
   const addEntry = () => {
+    // Check if previous row has some data
+    const lastEntry = formData.entries[formData.entries.length - 1];
+    const hasLastEntryData = lastEntry.start || lastEntry.end || lastEntry.odAverage || 
+                           lastEntry.unitStart || lastEntry.visual || lastEntry.print;
+    
+    if (formData.entries.length > 0 && !hasLastEntryData) {
+      toast({
+        title: "Cannot Add Row",
+        description: "Please enter some data in the previous row before adding a new one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     onFormDataChange({
       ...formData,
       entries: [...formData.entries, generateEmptyEntry()],
@@ -88,6 +102,15 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
 
   const removeEntry = (index: number) => {
     if (formData.entries.length > 1) {
+      const entryToRemove = formData.entries[index];
+      const hasEntryData = entryToRemove.start || entryToRemove.end || entryToRemove.odAverage || 
+                          entryToRemove.unitStart || entryToRemove.visual || entryToRemove.print;
+      
+      if (hasEntryData) {
+        const confirmed = window.confirm("This row contains data. Are you sure you want to delete it?");
+        if (!confirmed) return;
+      }
+
       const updatedEntries = formData.entries.filter((_, i) => i !== index);
       onFormDataChange({
         ...formData,
@@ -272,31 +295,36 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
         {/* Production Table */}
         <ProductionTable entries={formData.entries} targetSpecs={formData.targetSpecs} onEntryChange={handleEntryChange} />
 
-        {/* Entry Management */}
-        <Card className="shadow-[var(--shadow-soft)]">
-          <CardContent className="p-4">
-            <div className="flex gap-3">
-              <Button onClick={addEntry} variant="outline">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Row
-              </Button>
-              <Button 
-                onClick={() => removeEntry(formData.entries.length - 1)} 
-                variant="outline" 
-                disabled={formData.entries.length <= 1}
-                className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Remove Row
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Entry Management and Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-between">
+          {/* Entry Management */}
+          <Card className="shadow-[var(--shadow-soft)] flex-1">
+            <CardContent className="p-4">
+              <div className="flex gap-3">
+                <Button 
+                  onClick={addEntry} 
+                  variant="outline"
+                  disabled={formData.entries.length > 0 && !formData.entries[formData.entries.length - 1].start && !formData.entries[formData.entries.length - 1].odAverage && !formData.entries[formData.entries.length - 1].unitStart}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Row
+                </Button>
+                <Button 
+                  onClick={() => removeEntry(formData.entries.length - 1)} 
+                  variant="outline" 
+                  disabled={formData.entries.length <= 1}
+                  className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Remove Row
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Action Buttons */}
-        <Card className="shadow-[var(--shadow-soft)]">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4 justify-between">
+          {/* Action Buttons */}
+          <Card className="shadow-[var(--shadow-soft)] w-full sm:w-auto">
+            <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button onClick={handleSave} className="bg-primary hover:bg-primary-hover">
                   <Save className="mr-2 h-4 w-4" />
@@ -307,9 +335,9 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
                   Export Data
                 </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* QR Scanner Modal */}
