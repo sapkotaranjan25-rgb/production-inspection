@@ -141,15 +141,30 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
   };
 
   const handleChange = (index: number, field: keyof ProductionEntry, value: string) => {
+    // For number fields, allow the raw string to be stored temporarily
+    // This allows users to type decimals like "0." or "0.01" without losing the decimal point
     let processedValue: string | number = value;
     
-    // Handle number fields
+    // Only parse to number if the value is complete (not ending with . or having trailing zeros we want to preserve)
     if (['odAverage', 'odMaximum', 'odMinimum', 'odEnd', 'wallMinimum', 'wallMaximum',
          'odAtSaw', 'odAtVacTank', 'meltPress', 'actualPPH', 'actualWtPerFt', 'gain', 'loss',
          'acceptedLbs', 'scrapLbs', 'regrindConsumed'].includes(field)) {
-      processedValue = value === '' ? '' : parseFloat(value) || '';
+      if (value === '' || value === '-') {
+        processedValue = value;
+      } else {
+        // Allow any valid number input including decimals
+        const parsed = parseFloat(value);
+        // Only store as number if it's a valid complete number
+        // Otherwise keep as string to preserve typing state
+        processedValue = !isNaN(parsed) && !value.endsWith('.') ? parsed : value;
+      }
     } else if (['unitStart', 'unitEnd', 'acceptedFt', 'scrapFts'].includes(field)) {
-      processedValue = value === '' ? '' : parseInt(value) || '';
+      if (value === '' || value === '-') {
+        processedValue = value;
+      } else {
+        const parsed = parseInt(value);
+        processedValue = isNaN(parsed) ? '' : parsed;
+      }
     }
     
     onEntryChange(index, field, processedValue);
@@ -257,12 +272,12 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'outOfRound'), 'outOfRound')}`}>
+                    <div className={`text-xs h-8 flex items-center justify-center rounded text-foreground font-medium ${getConditionalFormatting(calculateField(entry, 'outOfRound'), 'outOfRound') || 'bg-muted text-muted-foreground'}`}>
                       {formatNumber(calculateField(entry, 'outOfRound'))}
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'ovality'), 'ovality')}`}>
+                    <div className={`text-xs h-8 flex items-center justify-center rounded text-foreground font-medium ${getConditionalFormatting(calculateField(entry, 'ovality'), 'ovality') || 'bg-muted text-muted-foreground'}`}>
                       {formatNumber(calculateField(entry, 'ovality'))}
                     </div>
                   </TableCell>
@@ -277,7 +292,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'toeIn'), 'toeIn')}`}>
+                    <div className={`text-xs h-8 flex items-center justify-center rounded text-foreground font-medium ${getConditionalFormatting(calculateField(entry, 'toeIn'), 'toeIn') || 'bg-muted text-muted-foreground'}`}>
                       {formatNumber(calculateField(entry, 'toeIn'))}
                     </div>
                   </TableCell>
@@ -302,7 +317,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(calculateField(entry, 'eccentricity'), 'eccentricity')}`}>
+                    <div className={`text-xs h-8 flex items-center justify-center rounded text-foreground font-medium ${getConditionalFormatting(calculateField(entry, 'eccentricity'), 'eccentricity') || 'bg-muted text-muted-foreground'}`}>
                       {formatNumber(calculateField(entry, 'eccentricity'))}
                     </div>
                   </TableCell>

@@ -76,10 +76,19 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   };
 
   const addEntry = () => {
-    // Check if previous row has ALL fields filled with value or "-"
+    // Check if previous row has required fields filled (everything except gain/loss calculated fields, and either gain OR loss)
     const lastEntry = formData.entries[formData.entries.length - 1];
-    const allFieldsFilled = Object.entries(lastEntry).every(([key, value]) => {
-      // Check if the value is not empty (for strings) or is a number (including 0)
+    
+    // List of fields that need to be filled (excluding calculated fields: outOfRound, ovality, toeIn, eccentricity, gain, loss)
+    const requiredFields: (keyof ProductionEntry)[] = [
+      'start', 'end', 'odAverage', 'odMaximum', 'odMinimum', 'odEnd',
+      'wallMinimum', 'wallMaximum', 'visual', 'print', 'odAtSaw', 'odAtVacTank',
+      'meltPress', 'dieHeadClean', 'unitStart', 'unitEnd', 'actualPPH', 'actualWtPerFt',
+      'acceptedFt', 'acceptedLbs', 'scrapFts', 'scrapLbs', 'scrapCode', 'regrindConsumed'
+    ];
+    
+    const allFieldsFilled = requiredFields.every(field => {
+      const value = lastEntry[field];
       return value !== '' && value !== null && value !== undefined;
     });
     
@@ -170,8 +179,54 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     });
   };
 
+  const calculateEntryFields = (entry: ProductionEntry): ProductionEntry => {
+    const calculatedEntry = { ...entry };
+    
+    // Calculate Out of Round
+    if (typeof entry.odMaximum === 'number' && typeof entry.odMinimum === 'number') {
+      calculatedEntry.outOfRound = Number((entry.odMaximum - entry.odMinimum).toFixed(3));
+    }
+    
+    // Calculate Ovality
+    if (typeof entry.odMaximum === 'number' && typeof entry.odMinimum === 'number' && 
+        entry.odMaximum + entry.odMinimum !== 0) {
+      calculatedEntry.ovality = Number((((entry.odMaximum - entry.odMinimum) / (entry.odMaximum + entry.odMinimum)) * 200).toFixed(3));
+    }
+    
+    // Calculate Toe-in
+    if (typeof entry.odEnd === 'number' && typeof entry.odAverage === 'number' && entry.odAverage !== 0) {
+      calculatedEntry.toeIn = Number((((entry.odEnd - entry.odAverage) / entry.odAverage) * 100).toFixed(3));
+    }
+    
+    // Calculate Eccentricity
+    if (typeof entry.wallMaximum === 'number' && typeof entry.wallMinimum === 'number' && entry.wallMaximum !== 0) {
+      calculatedEntry.eccentricity = Number((((entry.wallMaximum - entry.wallMinimum) / entry.wallMaximum) * 100).toFixed(3));
+    }
+    
+    // Calculate Gain/Loss
+    const actualWt = parseFloat(entry.actualWtPerFt?.toString() || '0');
+    const theoWt = parseFloat(formData.targetSpecs.theoWtPerFt?.toString() || '0');
+    
+    if (actualWt !== 0 && theoWt !== 0) {
+      const calculatedValue = ((actualWt - theoWt) / theoWt) * 100;
+      const isGain = calculatedValue < 0;
+      const absValue = Math.abs(calculatedValue);
+      
+      calculatedEntry.gain = isGain ? Number(absValue.toFixed(2)) : 0;
+      calculatedEntry.loss = !isGain ? Number(absValue.toFixed(2)) : 0;
+    }
+    
+    return calculatedEntry;
+  };
+
   const handleExport = () => {
-    const dataStr = JSON.stringify(formData, null, 2);
+    // Calculate all fields for each entry before exporting
+    const exportData = {
+      ...formData,
+      entries: formData.entries.map(entry => calculateEntryFields(entry))
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     
@@ -227,7 +282,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   }, 0);
 
   return (
-    <div className="min-h-screen bg-background p-4 space-y-6">
+    <div className="bg-background p-4 space-y-6">
       <div className="max-w-full mx-auto">
 
         {/* Form Header */}
@@ -304,7 +359,19 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
               <Button 
                 onClick={addEntry} 
                 variant="outline"
-                disabled={formData.entries.length > 0 && !Object.entries(formData.entries[formData.entries.length - 1]).every(([key, value]) => value !== '' && value !== null && value !== undefined)}
+                disabled={formData.entries.length > 0 && (() => {
+                  const lastEntry = formData.entries[formData.entries.length - 1];
+                  const requiredFields: (keyof ProductionEntry)[] = [
+                    'start', 'end', 'odAverage', 'odMaximum', 'odMinimum', 'odEnd',
+                    'wallMinimum', 'wallMaximum', 'visual', 'print', 'odAtSaw', 'odAtVacTank',
+                    'meltPress', 'dieHeadClean', 'unitStart', 'unitEnd', 'actualPPH', 'actualWtPerFt',
+                    'acceptedFt', 'acceptedLbs', 'scrapFts', 'scrapLbs', 'scrapCode', 'regrindConsumed'
+                  ];
+                  return !requiredFields.every(field => {
+                    const value = lastEntry[field];
+                    return value !== '' && value !== null && value !== undefined;
+                  });
+                })()}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Row

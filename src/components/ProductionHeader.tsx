@@ -256,67 +256,67 @@ export function ProductionHeader({
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
             <div className="text-center">
               <div className="font-medium text-foreground">OD Avg</div>
-              <div className="text-primary">{targetSpecs.odAverage || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.odAverage || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">OD Max</div>
-              <div className="text-primary">{targetSpecs.odMax || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.odMax || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">OD Min</div>
-              <div className="text-primary">{targetSpecs.odMin || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.odMin || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Cal Max</div>
-              <div className="text-primary">{targetSpecs.caliperMaximum || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.caliperMaximum || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Cal Min</div>
-              <div className="text-primary">{targetSpecs.caliperMinimum || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.caliperMinimum || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Out Round</div>
-              <div className="text-primary">{targetSpecs.outOfRound || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.outOfRound || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Ovality</div>
-              <div className="text-primary">{targetSpecs.ovality || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.ovality || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Toe-in</div>
-              <div className="text-primary">{targetSpecs.toeIn || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.toeIn || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Wall Min</div>
-              <div className="text-primary">{targetSpecs.wallMin || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.wallMin || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Wall Max</div>
-              <div className="text-primary">{targetSpecs.wallMax || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.wallMax || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Target Min</div>
-              <div className="text-primary">{targetSpecs.targetMin || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.targetMin || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Target Max</div>
-              <div className="text-primary">{targetSpecs.targetMax || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.targetMax || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Eccentric</div>
-              <div className="text-primary">{targetSpecs.eccentricity || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.eccentricity || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Goal PPH</div>
-              <div className="text-primary">{targetSpecs.goalPPH || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.goalPPH || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Theo Wt/Ft</div>
-              <div className="text-primary">{targetSpecs.theoWtPerFt || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.theoWtPerFt || ''}</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-foreground">Target Gain</div>
-              <div className="text-primary">{targetSpecs.targetGain || ''}</div>
+              <div className="text-primary font-bold text-base">{targetSpecs.targetGain || ''}</div>
             </div>
           </div>
         </CardContent>
