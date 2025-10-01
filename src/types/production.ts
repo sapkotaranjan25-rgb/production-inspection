@@ -84,7 +84,7 @@ export interface ProductionTotals {
   scrapFts: number;
 }
 
-export const VISUAL_OPTIONS = ['Pass', 'Fail'] as const;
-export const PRINT_OPTIONS = ['Pass', 'Fail'] as const;
-export const DIE_HEAD_OPTIONS = ['Yes', 'No'] as const;
+export const VISUAL_OPTIONS = ['-', 'Pass', 'Fail'] as const;
+export const PRINT_OPTIONS = ['-', 'Pass', 'Fail'] as const;
+export const DIE_HEAD_OPTIONS = ['-', 'Yes', 'No'] as const;
 export const SCRAP_CODES = ['A', 'B', 'C', 'D'] as const;

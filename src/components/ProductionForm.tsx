@@ -76,7 +76,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   };
 
   const addEntry = () => {
-    // Check if previous row has required fields filled (everything except gain/loss calculated fields, and either gain OR loss)
+    // Check if previous row has required fields filled (everything except gain/loss calculated fields)
     const lastEntry = formData.entries[formData.entries.length - 1];
     
     // List of fields that need to be filled (excluding calculated fields: outOfRound, ovality, toeIn, eccentricity, gain, loss)
@@ -101,9 +101,22 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
       return;
     }
 
+    // Create new entry with start time after previous end time
+    const newEntry = generateEmptyEntry();
+    if (lastEntry.end) {
+      newEntry.start = lastEntry.end;
+    }
+    
+    // Set unit start based on previous unit end
+    if (typeof lastEntry.unitEnd === 'number' && lastEntry.unitEnd > 0) {
+      newEntry.unitStart = lastEntry.unitEnd + 1;
+    } else {
+      newEntry.unitStart = 0;
+    }
+
     onFormDataChange({
       ...formData,
-      entries: [...formData.entries, generateEmptyEntry()],
+      entries: [...formData.entries, newEntry],
     });
     toast({
       title: "Row Added",
@@ -274,11 +287,14 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     gainLossLabel = gainLossValue < 0 ? 'Gain' : 'Loss';
   }
 
-  // Calculate Total Units
+  // Calculate Total Units: Sum of (Unit End - Unit Start) + 1 from each row
   const totalUnits = formData.entries.reduce((sum, entry) => {
     const unitStart = parseFloat(entry.unitStart?.toString() || '0');
     const unitEnd = parseFloat(entry.unitEnd?.toString() || '0');
-    return sum + Math.abs(unitEnd - unitStart);
+    if (unitEnd > 0 && unitStart >= 0 && unitEnd >= unitStart) {
+      return sum + (unitEnd - unitStart) + 1;
+    }
+    return sum;
   }, 0);
 
   return (

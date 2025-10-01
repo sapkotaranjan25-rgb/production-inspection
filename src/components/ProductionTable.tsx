@@ -90,14 +90,6 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
         if (value === 'Fail') return 'bg-red-600/80';
         return '';
         
-      case 'gain':
-        const targetGain = parseFloat(targetSpecs.targetGain?.toString() || '0');
-        if (targetSpecs.targetGain?.toString() === '-' || targetGain === 0) return '';
-        return numValue <= targetGain ? 'bg-green-600/50' : 'bg-red-600/80';
-        
-      case 'loss':
-        return 'bg-yellow-600/50'; // Always yellow for loss
-        
       default:
         return '';
     }
@@ -171,9 +163,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
   };
 
   const handleSelectChange = (index: number, field: keyof ProductionEntry, value: string) => {
-    // Convert "none" to empty string for clearing selection
-    const newValue = value === 'none' ? '' : value;
-    onEntryChange(index, field, newValue);
+    onEntryChange(index, field, value);
   };
 
   return (
@@ -322,12 +312,11 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.visual || 'none'} onValueChange={(value) => handleSelectChange(index, 'visual', value)} disabled={shouldLockFirstRow}>
+                    <Select value={entry.visual || '-'} onValueChange={(value) => handleSelectChange(index, 'visual', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.visual, 'visual')}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Clear</SelectItem>
                         {VISUAL_OPTIONS.map(option => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
@@ -335,12 +324,11 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </Select>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.print || 'none'} onValueChange={(value) => handleSelectChange(index, 'print', value)} disabled={shouldLockFirstRow}>
+                    <Select value={entry.print || '-'} onValueChange={(value) => handleSelectChange(index, 'print', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.print, 'print')}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Clear</SelectItem>
                         {PRINT_OPTIONS.map(option => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
@@ -378,7 +366,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.dieHeadClean} onValueChange={(value) => handleChange(index, 'dieHeadClean', value)} disabled={shouldLockFirstRow}>
+                    <Select value={entry.dieHeadClean || '-'} onValueChange={(value) => handleChange(index, 'dieHeadClean', value)} disabled={shouldLockFirstRow}>
                       <SelectTrigger className="text-xs h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -428,12 +416,12 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(gainLossData.gain, 'gain')}`}>
+                    <div className="text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground">
                       {gainLossData.gain > 0 ? gainLossData.gain.toFixed(2) : ''}
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <div className={`text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground ${getConditionalFormatting(gainLossData.loss, 'loss')}`}>
+                    <div className="text-xs h-8 flex items-center justify-center bg-muted rounded text-muted-foreground">
                       {gainLossData.loss > 0 ? gainLossData.loss.toFixed(2) : ''}
                     </div>
                   </TableCell>
