@@ -179,7 +179,7 @@ export function ProductionTabs() {
               <Button 
                 onClick={addNewForm} 
                 variant="outline" 
-                className="w-full h-12 bg-[hsl(var(--light-blue))] border-[hsl(var(--light-blue))] text-[hsl(var(--light-blue-foreground))] hover:bg-[hsl(var(--light-blue-hover))] px-6"
+                className="w-full h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                 disabled={forms.length >= 12}
               >
                 <Plus className="mr-2 h-4 w-4" />

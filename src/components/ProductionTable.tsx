@@ -162,15 +162,6 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
     onEntryChange(index, field, processedValue);
   };
 
-  const handleSelectChange = (index: number, field: keyof ProductionEntry, value: string, currentValue: string) => {
-    // Toggle behavior: if clicking same option, deselect it
-    if (currentValue === value) {
-      onEntryChange(index, field, '');
-    } else {
-      onEntryChange(index, field, value);
-    }
-  };
-
   return (
     <Card className="shadow-[var(--shadow-soft)]">
       <CardContent className="p-0">
@@ -320,7 +311,14 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                   <TableCell className="p-1">
                     <Select 
                       value={entry.visual || ''} 
-                      onValueChange={(value) => handleSelectChange(index, 'visual', value, entry.visual)} 
+                      onValueChange={(value) => {
+                        // Toggle: if clicking same option, deselect
+                        if (entry.visual === value) {
+                          onEntryChange(index, 'visual', '');
+                        } else {
+                          onEntryChange(index, 'visual', value);
+                        }
+                      }}
                       disabled={isLocked}
                     >
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.visual, 'visual')}`}>
@@ -328,7 +326,19 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       </SelectTrigger>
                       <SelectContent>
                         {VISUAL_OPTIONS.map(option => (
-                          <SelectItem key={option} value={option}>{option}</SelectItem>
+                          <SelectItem 
+                            key={option} 
+                            value={option}
+                            onClick={(e) => {
+                              // Allow deselect by clicking same option
+                              if (entry.visual === option) {
+                                e.preventDefault();
+                                onEntryChange(index, 'visual', '');
+                              }
+                            }}
+                          >
+                            {option}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -336,7 +346,14 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                   <TableCell className="p-1">
                     <Select 
                       value={entry.print || ''} 
-                      onValueChange={(value) => handleSelectChange(index, 'print', value, entry.print)} 
+                      onValueChange={(value) => {
+                        // Toggle: if clicking same option, deselect
+                        if (entry.print === value) {
+                          onEntryChange(index, 'print', '');
+                        } else {
+                          onEntryChange(index, 'print', value);
+                        }
+                      }}
                       disabled={isLocked}
                     >
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.print, 'print')}`}>
@@ -344,7 +361,19 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       </SelectTrigger>
                       <SelectContent>
                         {PRINT_OPTIONS.map(option => (
-                          <SelectItem key={option} value={option}>{option}</SelectItem>
+                          <SelectItem 
+                            key={option} 
+                            value={option}
+                            onClick={(e) => {
+                              // Allow deselect by clicking same option
+                              if (entry.print === option) {
+                                e.preventDefault();
+                                onEntryChange(index, 'print', '');
+                              }
+                            }}
+                          >
+                            {option}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -382,7 +411,14 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                   <TableCell className="p-1">
                     <Select 
                       value={entry.dieHeadClean || ''} 
-                      onValueChange={(value) => handleSelectChange(index, 'dieHeadClean', value, entry.dieHeadClean)} 
+                      onValueChange={(value) => {
+                        // Toggle: if clicking same option, deselect
+                        if (entry.dieHeadClean === value) {
+                          onEntryChange(index, 'dieHeadClean', '');
+                        } else {
+                          onEntryChange(index, 'dieHeadClean', value);
+                        }
+                      }}
                       disabled={isLocked}
                     >
                       <SelectTrigger className="text-xs h-8">
@@ -390,7 +426,19 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       </SelectTrigger>
                       <SelectContent>
                         {DIE_HEAD_OPTIONS.map(option => (
-                          <SelectItem key={option} value={option}>{option}</SelectItem>
+                          <SelectItem 
+                            key={option} 
+                            value={option}
+                            onClick={(e) => {
+                              // Allow deselect by clicking same option
+                              if (entry.dieHeadClean === option) {
+                                e.preventDefault();
+                                onEntryChange(index, 'dieHeadClean', '');
+                              }
+                            }}
+                          >
+                            {option}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

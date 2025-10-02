@@ -123,11 +123,12 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
       newEntry.start = lastEntry.end;
     }
     
-    // Set unit start based on previous unit end
+    // Set unit start based on previous unit end (only if unitEnd > 0)
     if (typeof lastEntry.unitEnd === 'number' && lastEntry.unitEnd > 0) {
       newEntry.unitStart = lastEntry.unitEnd + 1;
     } else {
-      newEntry.unitStart = 0;
+      // If unitEnd is 0 or empty, don't carry over
+      newEntry.unitStart = '';
     }
 
     onFormDataChange({
@@ -143,10 +144,21 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   const removeEntry = (index: number) => {
     if (formData.entries.length > 1) {
       const entryToRemove = formData.entries[index];
-      const hasEntryData = entryToRemove.start || entryToRemove.end || entryToRemove.odAverage || 
-                          entryToRemove.unitStart || entryToRemove.visual || entryToRemove.print;
       
-      if (hasEntryData) {
+      // Check if row has data beyond just start and unitStart
+      const hasSignificantData = entryToRemove.end || entryToRemove.odAverage || 
+                                  entryToRemove.odMaximum || entryToRemove.odMinimum ||
+                                  entryToRemove.odEnd || entryToRemove.wallMinimum || 
+                                  entryToRemove.wallMaximum || entryToRemove.visual || 
+                                  entryToRemove.print || entryToRemove.odAtSaw || 
+                                  entryToRemove.odAtVacTank || entryToRemove.meltPress ||
+                                  entryToRemove.dieHeadClean || entryToRemove.unitEnd ||
+                                  entryToRemove.actualPPH || entryToRemove.actualWtPerFt ||
+                                  entryToRemove.acceptedFt || entryToRemove.acceptedLbs ||
+                                  entryToRemove.scrapFts || entryToRemove.scrapLbs ||
+                                  entryToRemove.scrapCode || entryToRemove.regrindConsumed;
+      
+      if (hasSignificantData) {
         const confirmed = window.confirm("This row contains data. Are you sure you want to delete it?");
         if (!confirmed) return;
       }
