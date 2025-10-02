@@ -66,9 +66,22 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   };
 
   const handleEntryChange = (index: number, field: keyof ProductionEntry, value: string | number) => {
-    const updatedEntries = formData.entries.map((entry, i) => 
-      i === index ? { ...entry, [field]: value } : entry
-    );
+    const updatedEntries = formData.entries.map((entry, i) => {
+      if (i === index) {
+        return { ...entry, [field]: value };
+      }
+      // Lock previous row when user starts entering data on current row
+      if (i === index - 1 && !entry.locked) {
+        const hasCurrentRowData = formData.entries[index].start || 
+                                   formData.entries[index].odAverage || 
+                                   formData.entries[index].unitStart ||
+                                   value !== '';
+        if (hasCurrentRowData) {
+          return { ...entry, locked: true };
+        }
+      }
+      return entry;
+    });
     onFormDataChange({
       ...formData,
       entries: updatedEntries,
@@ -76,14 +89,14 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   };
 
   const addEntry = () => {
-    // Check if previous row has required fields filled (everything except gain/loss calculated fields)
+    // Check if previous row has required fields filled (excluding visual, print, dieHeadClean, gain, loss, and calculated fields)
     const lastEntry = formData.entries[formData.entries.length - 1];
     
-    // List of fields that need to be filled (excluding calculated fields: outOfRound, ovality, toeIn, eccentricity, gain, loss)
+    // List of fields that need to be filled (excluding calculated fields and optional fields)
     const requiredFields: (keyof ProductionEntry)[] = [
       'start', 'end', 'odAverage', 'odMaximum', 'odMinimum', 'odEnd',
-      'wallMinimum', 'wallMaximum', 'visual', 'print', 'odAtSaw', 'odAtVacTank',
-      'meltPress', 'dieHeadClean', 'unitStart', 'unitEnd', 'actualPPH', 'actualWtPerFt',
+      'wallMinimum', 'wallMaximum', 'odAtSaw', 'odAtVacTank',
+      'meltPress', 'unitStart', 'unitEnd', 'actualPPH', 'actualWtPerFt',
       'acceptedFt', 'acceptedLbs', 'scrapFts', 'scrapLbs', 'scrapCode', 'regrindConsumed'
     ];
     
@@ -95,11 +108,14 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     if (formData.entries.length > 0 && !allFieldsFilled) {
       toast({
         title: "Cannot Add Row",
-        description: "Please complete all fields in the previous row before adding a new one.",
+        description: "Please complete all required fields in the previous row before adding a new one.",
         variant: "destructive",
       });
       return;
     }
+
+    // Lock the previous row before adding new one
+    const updatedEntries = formData.entries.map(entry => ({ ...entry, locked: true }));
 
     // Create new entry with start time after previous end time
     const newEntry = generateEmptyEntry();
@@ -116,7 +132,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
 
     onFormDataChange({
       ...formData,
-      entries: [...formData.entries, newEntry],
+      entries: [...updatedEntries, newEntry],
     });
     toast({
       title: "Row Added",
@@ -157,11 +173,13 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
       return;
     }
 
-    console.log('Saving production form:', formData);
+    // Include form ID in submission
+    console.log('Saving production form with ID:', formData.id);
+    console.log('Form data:', formData);
     
     toast({
       title: "Form Saved",
-      description: "Production form has been saved successfully.",
+      description: `Form ${formData.id} has been saved successfully.`,
     });
   };
 
@@ -236,6 +254,8 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     // Calculate all fields for each entry before exporting
     const exportData = {
       ...formData,
+      formId: formData.id, // Include form ID in export
+      exportDate: new Date().toISOString(), // Add export timestamp
       entries: formData.entries.map(entry => calculateEntryFields(entry))
     };
     
@@ -245,14 +265,14 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `production-form-${formData.productionLine}-${formData.date?.toISOString().split('T')[0]}.json`;
+    link.download = `production-form-${formData.id}-${formData.date?.toISOString().split('T')[0]}.json`;
     link.click();
     
     URL.revokeObjectURL(url);
     
     toast({
       title: "Form Exported",
-      description: "Production form has been exported successfully.",
+      description: `Form ${formData.id} has been exported successfully.`,
     });
   };
 
@@ -379,8 +399,8 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
                   const lastEntry = formData.entries[formData.entries.length - 1];
                   const requiredFields: (keyof ProductionEntry)[] = [
                     'start', 'end', 'odAverage', 'odMaximum', 'odMinimum', 'odEnd',
-                    'wallMinimum', 'wallMaximum', 'visual', 'print', 'odAtSaw', 'odAtVacTank',
-                    'meltPress', 'dieHeadClean', 'unitStart', 'unitEnd', 'actualPPH', 'actualWtPerFt',
+                    'wallMinimum', 'wallMaximum', 'odAtSaw', 'odAtVacTank',
+                    'meltPress', 'unitStart', 'unitEnd', 'actualPPH', 'actualWtPerFt',
                     'acceptedFt', 'acceptedLbs', 'scrapFts', 'scrapLbs', 'scrapCode', 'regrindConsumed'
                   ];
                   return !requiredFields.every(field => {
@@ -392,15 +412,16 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
                 <Plus className="mr-2 h-4 w-4" />
                 Add Row
               </Button>
-              <Button 
-                onClick={() => removeEntry(formData.entries.length - 1)} 
-                variant="outline" 
-                disabled={formData.entries.length <= 1}
-                className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Remove Row
-              </Button>
+              {formData.entries.length > 1 && !formData.entries[formData.entries.length - 1].locked && (
+                <Button 
+                  onClick={() => removeEntry(formData.entries.length - 1)} 
+                  variant="outline" 
+                  className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Remove Row
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

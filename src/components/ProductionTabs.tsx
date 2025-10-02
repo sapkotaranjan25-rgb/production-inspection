@@ -51,7 +51,8 @@ export function ProductionTabs() {
       return;
     }
 
-    const newFormId = `form-${Date.now()}`;
+    // Generate unique form ID with timestamp and random string
+    const newFormId = `form-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newForm = generateInitialFormData(newFormId);
     setForms(prev => [...prev, newForm]);
     setActiveTab(newFormId);

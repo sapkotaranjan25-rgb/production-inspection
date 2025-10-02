@@ -162,8 +162,13 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
     onEntryChange(index, field, processedValue);
   };
 
-  const handleSelectChange = (index: number, field: keyof ProductionEntry, value: string) => {
-    onEntryChange(index, field, value);
+  const handleSelectChange = (index: number, field: keyof ProductionEntry, value: string, currentValue: string) => {
+    // Toggle behavior: if clicking same option, deselect it
+    if (currentValue === value) {
+      onEntryChange(index, field, '');
+    } else {
+      onEntryChange(index, field, value);
+    }
   };
 
   return (
@@ -209,6 +214,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
               {entries.map((entry, index) => {
                 const isFirstRow = index === 0;
                 const shouldLockFirstRow = isFirstRow && !isTargetSpecsComplete();
+                const isLocked = entry.locked || shouldLockFirstRow;
                 const gainLossData = calculateGainLoss(entry);
                 
                 return (
@@ -219,7 +225,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.start}
                       onChange={(e) => handleChange(index, 'start', e.target.value)}
                       className="text-xs h-8"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -228,7 +234,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.end}
                       onChange={(e) => handleChange(index, 'end', e.target.value)}
                       className="text-xs h-8"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -238,7 +244,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odAverage}
                       onChange={(e) => handleChange(index, 'odAverage', e.target.value)}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odAverage, 'odAverage')}`}
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -248,7 +254,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odMaximum}
                       onChange={(e) => handleChange(index, 'odMaximum', e.target.value)}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odMaximum, 'odMaximum')}`}
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -258,7 +264,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odMinimum}
                       onChange={(e) => handleChange(index, 'odMinimum', e.target.value)}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odMinimum, 'odMinimum')}`}
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -278,7 +284,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odEnd}
                       onChange={(e) => handleChange(index, 'odEnd', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -293,7 +299,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.wallMinimum}
                       onChange={(e) => handleChange(index, 'wallMinimum', e.target.value)}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.wallMinimum, 'wallMinimum')}`}
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -303,7 +309,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.wallMaximum}
                       onChange={(e) => handleChange(index, 'wallMaximum', e.target.value)}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.wallMaximum, 'wallMaximum')}`}
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -312,9 +318,13 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.visual || '-'} onValueChange={(value) => handleSelectChange(index, 'visual', value)} disabled={shouldLockFirstRow}>
+                    <Select 
+                      value={entry.visual || ''} 
+                      onValueChange={(value) => handleSelectChange(index, 'visual', value, entry.visual)} 
+                      disabled={isLocked}
+                    >
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.visual, 'visual')}`}>
-                        <SelectValue />
+                        <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
                         {VISUAL_OPTIONS.map(option => (
@@ -324,9 +334,13 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                     </Select>
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.print || '-'} onValueChange={(value) => handleSelectChange(index, 'print', value)} disabled={shouldLockFirstRow}>
+                    <Select 
+                      value={entry.print || ''} 
+                      onValueChange={(value) => handleSelectChange(index, 'print', value, entry.print)} 
+                      disabled={isLocked}
+                    >
                       <SelectTrigger className={`text-xs h-8 ${getConditionalFormatting(entry.print, 'print')}`}>
-                        <SelectValue />
+                        <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
                         {PRINT_OPTIONS.map(option => (
@@ -342,7 +356,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odAtSaw}
                       onChange={(e) => handleChange(index, 'odAtSaw', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -352,7 +366,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.odAtVacTank}
                       onChange={(e) => handleChange(index, 'odAtVacTank', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -362,13 +376,17 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.meltPress}
                       onChange={(e) => handleChange(index, 'meltPress', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.dieHeadClean || '-'} onValueChange={(value) => handleChange(index, 'dieHeadClean', value)} disabled={shouldLockFirstRow}>
+                    <Select 
+                      value={entry.dieHeadClean || ''} 
+                      onValueChange={(value) => handleSelectChange(index, 'dieHeadClean', value, entry.dieHeadClean)} 
+                      disabled={isLocked}
+                    >
                       <SelectTrigger className="text-xs h-8">
-                        <SelectValue />
+                        <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
                         {DIE_HEAD_OPTIONS.map(option => (
@@ -383,7 +401,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.unitStart}
                       onChange={(e) => handleChange(index, 'unitStart', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -392,7 +410,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.unitEnd}
                       onChange={(e) => handleChange(index, 'unitEnd', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -402,7 +420,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.actualPPH}
                       onChange={(e) => handleChange(index, 'actualPPH', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -412,7 +430,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.actualWtPerFt}
                       onChange={(e) => handleChange(index, 'actualWtPerFt', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -431,7 +449,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.acceptedFt}
                       onChange={(e) => handleChange(index, 'acceptedFt', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -441,7 +459,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.acceptedLbs}
                       onChange={(e) => handleChange(index, 'acceptedLbs', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -450,7 +468,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.scrapFts}
                       onChange={(e) => handleChange(index, 'scrapFts', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -460,11 +478,11 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.scrapLbs}
                       onChange={(e) => handleChange(index, 'scrapLbs', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                   <TableCell className="p-1">
-                    <Select value={entry.scrapCode} onValueChange={(value) => handleChange(index, 'scrapCode', value)} disabled={shouldLockFirstRow}>
+                    <Select value={entry.scrapCode} onValueChange={(value) => handleChange(index, 'scrapCode', value)} disabled={isLocked}>
                       <SelectTrigger className="text-xs h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -482,7 +500,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       value={entry.regrindConsumed}
                       onChange={(e) => handleChange(index, 'regrindConsumed', e.target.value)}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={shouldLockFirstRow}
+                      disabled={isLocked}
                     />
                   </TableCell>
                 </TableRow>
