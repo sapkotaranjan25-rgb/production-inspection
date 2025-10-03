@@ -68,6 +68,7 @@ export interface TargetSpecifications {
 
 export interface ProductionFormData {
   id: string;
+  randomId: number; // Random number between 1000-1000000 for ID generation
   productionSite: string;
   date: Date;
   shift: string;

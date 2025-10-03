@@ -8,8 +8,9 @@ import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Generate initial form data
-const generateInitialFormData = (id: string): ProductionFormData => ({
-  id,
+const generateInitialFormData = (randomId: number): ProductionFormData => ({
+  id: `temp-${randomId}`,
+  randomId,
   productionSite: '',
   date: new Date(),
   shift: '',
@@ -35,7 +36,7 @@ const generateInitialFormData = (id: string): ProductionFormData => ({
 export function ProductionTabs() {
   const { toast } = useToast();
   const [forms, setForms] = useState<ProductionFormData[]>([
-    generateInitialFormData('form-1')
+    generateInitialFormData(Math.floor(Math.random() * (1000000 - 1000 + 1)) + 1000)
   ]);
   const [activeTab, setActiveTab] = useState('form-1');
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
@@ -51,11 +52,11 @@ export function ProductionTabs() {
       return;
     }
 
-    // Generate unique form ID with timestamp and random string
-    const newFormId = `form-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newForm = generateInitialFormData(newFormId);
+    // Generate unique random ID between 1000 and 1000000
+    const randomId = Math.floor(Math.random() * (1000000 - 1000 + 1)) + 1000;
+    const newForm = generateInitialFormData(randomId);
     setForms(prev => [...prev, newForm]);
-    setActiveTab(newFormId);
+    setActiveTab(newForm.id);
     
     toast({
       title: "New Form Created",
@@ -179,7 +180,7 @@ export function ProductionTabs() {
               <Button 
                 onClick={addNewForm} 
                 variant="outline" 
-                className="w-full h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full h-[43px] bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                 disabled={forms.length >= 12}
               >
                 <Plus className="mr-2 h-4 w-4" />

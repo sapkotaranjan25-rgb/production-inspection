@@ -52,10 +52,23 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
   const [showQRScanner, setShowQRScanner] = useState(false);
 
   const handleFieldChange = (field: keyof ProductionFormData, value: any) => {
-    onFormDataChange({
+    const updatedData = {
       ...formData,
       [field]: value,
-    });
+    };
+    
+    // Update form ID if workOrderNumber, shift, or productionLine changes
+    if (field === 'workOrderNumber' || field === 'shift' || field === 'productionLine') {
+      const workOrder = field === 'workOrderNumber' ? value as string : formData.workOrderNumber;
+      const shift = field === 'shift' ? value as string : formData.shift;
+      const line = field === 'productionLine' ? value as string : formData.productionLine;
+      
+      if (workOrder && shift && line) {
+        updatedData.id = `${workOrder}-${shift}${line}-${formData.randomId}`;
+      }
+    }
+    
+    onFormDataChange(updatedData);
   };
 
   const handleTargetSpecsChange = (targetSpecs: TargetSpecifications) => {
