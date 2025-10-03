@@ -145,7 +145,7 @@ export function ProductionTabs() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="mb-4 flex items-end gap-2">
+          <div className="mb-4 flex items-start gap-2">
             {/* Form Tabs - 90% width */}
             <div className="flex-1 w-[90%]">
               <TabsList className="h-12 p-1 bg-muted flex w-full gap-1">

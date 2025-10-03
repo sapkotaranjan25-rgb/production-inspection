@@ -193,8 +193,8 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                 <TableHead className="text-center min-w-[90px]">Act Wt/Ft</TableHead>
                 <TableHead className="text-center min-w-[80px]">Gain</TableHead>
                 <TableHead className="text-center min-w-[80px]">Loss</TableHead>
-                <TableHead className="text-center min-w-[90px]">Acc Ft</TableHead>
-                <TableHead className="text-center min-w-[90px]">Acc Lbs</TableHead>
+                <TableHead className="text-center min-w-[90px]">Accepted Ft</TableHead>
+                <TableHead className="text-center min-w-[90px]">Accepted Lbs</TableHead>
                 <TableHead className="text-center min-w-[90px]">Scrap Ft</TableHead>
                 <TableHead className="text-center min-w-[90px]">Scrap Lbs</TableHead>
                 <TableHead className="text-center min-w-[80px]">Code</TableHead>
