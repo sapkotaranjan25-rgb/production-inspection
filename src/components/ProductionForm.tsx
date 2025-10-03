@@ -188,7 +188,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.date || !formData.shift || !formData.operatorName || !formData.productionLine || !formData.productionSite) {
       toast({
         title: "Missing Information",
@@ -198,14 +198,39 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
       return;
     }
 
-    // Include form ID in submission
-    console.log('Saving production form with ID:', formData.id);
-    console.log('Form data:', formData);
-    
-    toast({
-      title: "Form Saved",
-      description: `Form ${formData.id} has been saved successfully.`,
-    });
+    // Prepare the same JSON structure as export
+    const exportData = {
+      ...formData,
+      formId: formData.id,
+      exportDate: new Date().toISOString(),
+      entries: formData.entries.map(entry => calculateEntryFields(entry))
+    };
+
+    try {
+      const response = await fetch('https://defaulta33a68a4ce9a4535962c7d7a922164.2a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f708239c2e56483bb4cea6b0506e76af/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IUP5QDqxVfKQaoiNiFosSiKkTq4SBFQWxHaPnEdCi3k', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(exportData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      toast({
+        title: "Form Saved",
+        description: `Form ${formData.id} has been saved and sent to Power Automate successfully.`,
+      });
+    } catch (error) {
+      console.error('Error sending data to Power Automate:', error);
+      toast({
+        title: "Save Error",
+        description: "Failed to send data to Power Automate. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReset = () => {

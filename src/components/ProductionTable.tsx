@@ -141,7 +141,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
     if (['odAverage', 'odMaximum', 'odMinimum', 'odEnd', 'wallMinimum', 'wallMaximum',
          'odAtSaw', 'odAtVacTank', 'meltPress', 'actualPPH', 'actualWtPerFt', 'gain', 'loss',
          'acceptedLbs', 'scrapLbs', 'regrindConsumed'].includes(field)) {
-      if (value === '' || value === '-') {
+      if (value === '') {
         processedValue = value;
       } else {
         // Allow any valid number input including decimals
@@ -151,7 +151,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
         processedValue = !isNaN(parsed) && !value.endsWith('.') ? parsed : value;
       }
     } else if (['unitStart', 'unitEnd', 'acceptedFt', 'scrapFts'].includes(field)) {
-      if (value === '' || value === '-') {
+      if (value === '') {
         processedValue = value;
       } else {
         const parsed = parseInt(value);
@@ -160,6 +160,13 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
     }
     
     onEntryChange(index, field, processedValue);
+  };
+
+  // Block minus key in number inputs
+  const handleNumberKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === '-' || e.key === 'Minus') {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -234,6 +241,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.odAverage}
                       onChange={(e) => handleChange(index, 'odAverage', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odAverage, 'odAverage')}`}
                       disabled={isLocked}
                     />
@@ -244,6 +252,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.odMaximum}
                       onChange={(e) => handleChange(index, 'odMaximum', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odMaximum, 'odMaximum')}`}
                       disabled={isLocked}
                     />
@@ -254,6 +263,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.odMinimum}
                       onChange={(e) => handleChange(index, 'odMinimum', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.odMinimum, 'odMinimum')}`}
                       disabled={isLocked}
                     />
@@ -274,6 +284,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.odEnd}
                       onChange={(e) => handleChange(index, 'odEnd', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -289,6 +300,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.wallMinimum}
                       onChange={(e) => handleChange(index, 'wallMinimum', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.wallMinimum, 'wallMinimum')}`}
                       disabled={isLocked}
                     />
@@ -299,6 +311,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.wallMaximum}
                       onChange={(e) => handleChange(index, 'wallMaximum', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className={`text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${getConditionalFormatting(entry.wallMaximum, 'wallMaximum')}`}
                       disabled={isLocked}
                     />
@@ -384,6 +397,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.odAtSaw}
                       onChange={(e) => handleChange(index, 'odAtSaw', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -394,6 +408,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.odAtVacTank}
                       onChange={(e) => handleChange(index, 'odAtVacTank', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -404,6 +419,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.meltPress}
                       onChange={(e) => handleChange(index, 'meltPress', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -448,6 +464,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       type="number"
                       value={entry.unitStart}
                       onChange={(e) => handleChange(index, 'unitStart', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -457,6 +474,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       type="number"
                       value={entry.unitEnd}
                       onChange={(e) => handleChange(index, 'unitEnd', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -467,6 +485,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.actualPPH}
                       onChange={(e) => handleChange(index, 'actualPPH', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -477,6 +496,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.actualWtPerFt}
                       onChange={(e) => handleChange(index, 'actualWtPerFt', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -496,6 +516,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       type="number"
                       value={entry.acceptedFt}
                       onChange={(e) => handleChange(index, 'acceptedFt', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -506,6 +527,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.acceptedLbs}
                       onChange={(e) => handleChange(index, 'acceptedLbs', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -515,6 +537,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       type="number"
                       value={entry.scrapFts}
                       onChange={(e) => handleChange(index, 'scrapFts', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -525,6 +548,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.001"
                       value={entry.scrapLbs}
                       onChange={(e) => handleChange(index, 'scrapLbs', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
@@ -547,6 +571,7 @@ export function ProductionTable({ entries, targetSpecs, onEntryChange }: Product
                       step="0.1"
                       value={entry.regrindConsumed}
                       onChange={(e) => handleChange(index, 'regrindConsumed', e.target.value)}
+                      onKeyDown={handleNumberKeyDown}
                       className="text-xs h-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={isLocked}
                     />
