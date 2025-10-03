@@ -224,10 +224,10 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
         description: `Form ${formData.id} has been saved and sent to Power Automate successfully.`,
       });
     } catch (error) {
-      console.error('Error sending data to Power Automate:', error);
+      console.error('Error saving data:', error);
       toast({
         title: "Save Error",
-        description: "Failed to send data to Power Automate. Please try again.",
+        description: "Failed to send data. Please try again.",
         variant: "destructive",
       });
     }
