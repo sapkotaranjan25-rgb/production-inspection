@@ -35,10 +35,9 @@ const generateInitialFormData = (randomId: number): ProductionFormData => ({
 
 export function ProductionTabs() {
   const { toast } = useToast();
-  const [forms, setForms] = useState<ProductionFormData[]>([
-    generateInitialFormData(Math.floor(Math.random() * (1000000 - 1000 + 1)) + 1000)
-  ]);
-  const [activeTab, setActiveTab] = useState('form-1');
+  const initialForm = generateInitialFormData(Math.floor(Math.random() * (1000000 - 1000 + 1)) + 1000);
+  const [forms, setForms] = useState<ProductionFormData[]>([initialForm]);
+  const [activeTab, setActiveTab] = useState(initialForm.id);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [formToClose, setFormToClose] = useState<string | null>(null);
 
@@ -125,6 +124,11 @@ export function ProductionTabs() {
     setForms(prev => prev.map(form => 
       form.id === formId ? updatedFormData : form
     ));
+    
+    // If the form ID changed and this was the active form, update activeTab
+    if (activeTab === formId && updatedFormData.id !== formId) {
+      setActiveTab(updatedFormData.id);
+    }
   };
 
   const getFormDisplayName = (form: ProductionFormData, index: number) => {
