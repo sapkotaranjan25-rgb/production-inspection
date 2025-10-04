@@ -128,7 +128,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     }
 
     // Save form data silently before adding new row
-    await saveFormData(false);
+    // await saveFormData(false);
 
     // Lock the previous row before adding new one
     const updatedEntries = formData.entries.map(entry => ({ ...entry, locked: true }));
