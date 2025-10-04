@@ -207,11 +207,12 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     };
 
     try {
-      // Using GET method as required by the Power Automate trigger
-      // Note: This encodes the data in the URL - proper solution is to reconfigure Power Automate to accept POST
-      const dataParam = encodeURIComponent(JSON.stringify(exportData));
-      const response = await fetch(`https://defaulta33a68a4ce9a4535962c7d7a922164.2a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f708239c2e56483bb4cea6b0506e76af/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IUP5QDqxVfKQaoiNiFosSiKkTq4SBFQWxHaPnEdCi3k&data=${dataParam}`, {
-        method: 'GET',
+      const response = await fetch('https://defaulta33a68a4ce9a4535962c7d7a922164.2a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f708239c2e56483bb4cea6b0506e76af/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IUP5QDqxVfKQaoiNiFosSiKkTq4SBFQWxHaPnEdCi3k', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(exportData),
       });
 
       if (!response.ok) {
@@ -228,7 +229,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
       console.error('Error saving data:', error);
       toast({
         title: "Save Error",
-        description: "Failed to send data. Please reconfigure Power Automate to accept POST requests.",
+        description: "Failed to send data. Please try again.",
         variant: "destructive",
       });
     }
