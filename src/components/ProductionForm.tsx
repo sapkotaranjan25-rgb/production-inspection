@@ -101,7 +101,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     });
   };
 
-  const addEntry = () => {
+  const addEntry = async () => {
     // Check if previous row has required fields filled (excluding visual, print, dieHeadClean, gain, loss, and calculated fields)
     const lastEntry = formData.entries[formData.entries.length - 1];
     
@@ -126,6 +126,9 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
       });
       return;
     }
+
+    // Save form data silently before adding new row
+    await saveFormData(false);
 
     // Lock the previous row before adding new one
     const updatedEntries = formData.entries.map(entry => ({ ...entry, locked: true }));
@@ -188,14 +191,16 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
     }
   };
 
-  const handleSave = async () => {
+  const saveFormData = async (showNotification: boolean = true) => {
     if (!formData.date || !formData.shift || !formData.operatorName || !formData.productionLine || !formData.productionSite) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required header fields before saving.",
-        variant: "destructive",
-      });
-      return;
+      if (showNotification) {
+        toast({
+          title: "Missing Information",
+          description: "Please fill in all required header fields before saving.",
+          variant: "destructive",
+        });
+      }
+      return false;
     }
 
     // Prepare the same JSON structure as export
@@ -221,18 +226,28 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      toast({
-        title: "Form Saved",
-        description: `Form ${formData.id} has been saved.`,
-      });
+      if (showNotification) {
+        toast({
+          title: "Form Saved",
+          description: `Form ${formData.id} has been saved.`,
+        });
+      }
+      return true;
     } catch (error) {
       console.error('Error saving data:', error);
-      toast({
-        title: "Save Error",
-        description: "Failed to send data. Please try again.",
-        variant: "destructive",
-      });
+      if (showNotification) {
+        toast({
+          title: "Save Error",
+          description: "Failed to send data. Please try again.",
+          variant: "destructive",
+        });
+      }
+      return false;
     }
+  };
+
+  const handleSave = async () => {
+    await saveFormData(true);
   };
 
   const handleReset = () => {
