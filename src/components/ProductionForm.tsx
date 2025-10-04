@@ -223,7 +223,7 @@ export function ProductionForm({ formData, onFormDataChange }: ProductionFormPro
 
       toast({
         title: "Form Saved",
-        description: `Form ${formData.id} has been saved and sent to Power Automate successfully.`,
+        description: `Form ${formData.id} has been saved.`,
       });
     } catch (error) {
       console.error('Error saving data:', error);
